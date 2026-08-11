@@ -1,0 +1,17 @@
+{
+  "grade": 3,
+  "lesson": 2,
+  "title": "Lesson 2 - 水果",
+  "words": [
+    {"en": "apple", "zh": "蘋果", "emoji": "🍎", "image": ""},
+    {"en": "banana", "zh": "香蕉", "emoji": "🍌", "image": ""},
+    {"en": "orange", "zh": "橘子", "emoji": "🍊", "image": ""},
+    {"en": "grape", "zh": "葡萄", "emoji": "🍇", "image": ""},
+    {"en": "mango", "zh": "芒果", "emoji": "🥭", "image": ""},
+    {"en": "lemon", "zh": "檸檬", "emoji": "🍋", "image": ""},
+    {"en": "peach", "zh": "桃子", "emoji": "🍑", "image": ""},
+    {"en": "pear", "zh": "梨子", "emoji": "🍐", "image": ""},
+    {"en": "melon", "zh": "哈密瓜", "emoji": "🍈", "image": ""},
+    {"en": "cherry", "zh": "櫻桃", "emoji": "🍒", "image": ""}
+  ]
+}

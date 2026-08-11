@@ -1,0 +1,17 @@
+{
+  "grade": 5,
+  "lesson": 2,
+  "title": "Lesson 2 - 動詞",
+  "words": [
+    {"en": "celebrate", "zh": "慶祝", "emoji": "🎉", "image": ""},
+    {"en": "discover", "zh": "發現", "emoji": "🔍", "image": ""},
+    {"en": "imagine", "zh": "想像", "emoji": "💭", "image": ""},
+    {"en": "achieve", "zh": "達成", "emoji": "🏆", "image": ""},
+    {"en": "protect", "zh": "保護", "emoji": "🛡️", "image": ""},
+    {"en": "explore", "zh": "探索", "emoji": "🗺️", "image": ""},
+    {"en": "improve", "zh": "改善", "emoji": "📈", "image": ""},
+    {"en": "remember", "zh": "記住", "emoji": "🧠", "image": ""},
+    {"en": "practice", "zh": "練習", "emoji": "📚", "image": ""},
+    {"en": "understand", "zh": "理解", "emoji": "💡", "image": ""}
+  ]
+}

@@ -1,0 +1,1250 @@
+/**
+ * app.js - 主控制器
+ * 整合所有模組
+ */
+
+// ── Global State ──────────────────────────────────────────────
+
+const AppState = {
+  currentLearner: null,
+  currentQuestion: null,
+  recentWrong: [],
+  selectedLetters: [],
+  gameWords: [],
+  answerLocked: false
+};
+
+// ── Helpers ────────────────────────────────────────────────────
+
+function escHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function showToast(message, type = 'info') {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.className = 'toast toast-' + type + ' toast-show';
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.className = 'toast';
+  }, 2000);
+}
+
+function showView(viewId) {
+  document.querySelectorAll('.view').forEach(el => {
+    el.style.display = 'none';
+    el.classList.remove('active');
+  });
+  const target = document.getElementById(viewId);
+  if (target) {
+    target.style.display = 'flex';
+    target.classList.add('active');
+    // Scroll to top
+    window.scrollTo(0, 0);
+  }
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+function yesterdayStr() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+// ── View: Learner Select ───────────────────────────────────────
+
+function renderLearnerSelect() {
+  const learners = Storage.getLearners();
+  const list = document.getElementById('learner-list');
+  const hint = document.getElementById('no-learner-hint');
+
+  if (!list) return;
+
+  if (learners.length === 0) {
+    list.innerHTML = '';
+    if (hint) hint.style.display = 'block';
+  } else {
+    if (hint) hint.style.display = 'none';
+    list.innerHTML = learners.map(l => {
+      const gradeEmoji = l.grade >= 5 ? '🎓' : '📖';
+      return `<div class="learner-card card" data-id="${l.id}">
+        <div class="learner-card-avatar">${gradeEmoji}</div>
+        <div class="learner-card-name">${escHtml(l.name)}</div>
+        <div class="learner-card-grade">${l.grade}年級</div>
+        <div class="learner-card-stars">⭐ ${l.stars}</div>
+      </div>`;
+    }).join('');
+
+    list.querySelectorAll('.learner-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.dataset.id;
+        const learner = Storage.getLearner(id);
+        if (!learner) return;
+        AppState.currentLearner = learner;
+        showView('view-home');
+        renderHome();
+      });
+    });
+  }
+}
+
+function initLearnerSelectView() {
+  const btnAdd = document.getElementById('btn-add-learner');
+  const form = document.getElementById('add-learner-form');
+  const btnConfirm = document.getElementById('btn-confirm-add-learner');
+  const btnCancel = document.getElementById('btn-cancel-add-learner');
+  const nameInput = document.getElementById('new-learner-name');
+  const gradeHidden = document.getElementById('new-learner-grade');
+
+  if (btnAdd) {
+    btnAdd.addEventListener('click', () => {
+      form.style.display = 'block';
+      btnAdd.style.display = 'none';
+      nameInput.value = '';
+      gradeHidden.value = '';
+      document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('selected'));
+    });
+  }
+
+  document.querySelectorAll('.grade-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      gradeHidden.value = btn.dataset.grade;
+      document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+
+  if (btnConfirm) {
+    btnConfirm.addEventListener('click', () => {
+      const name = nameInput.value.trim();
+      const grade = gradeHidden.value;
+      if (!name) { showToast('請輸入名字', 'error'); return; }
+      if (!grade) { showToast('請選擇年級', 'error'); return; }
+      const learner = Storage.createLearner(name, Number(grade));
+      form.style.display = 'none';
+      btnAdd.style.display = '';
+      renderLearnerSelect();
+      showToast('學習者已建立！', 'success');
+      // Auto-select
+      AppState.currentLearner = learner;
+      showView('view-home');
+      renderHome();
+    });
+  }
+
+  if (btnCancel) {
+    btnCancel.addEventListener('click', () => {
+      form.style.display = 'none';
+      btnAdd.style.display = '';
+    });
+  }
+
+  // Enter key on name input
+  if (nameInput) {
+    nameInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') btnConfirm && btnConfirm.click();
+    });
+  }
+}
+
+// ── View: Home ────────────────────────────────────────────────
+
+function renderHome() {
+  const learner = AppState.currentLearner;
+  if (!learner) return;
+
+  // Refresh learner data from storage
+  const fresh = Storage.getLearner(learner.id);
+  if (fresh) AppState.currentLearner = fresh;
+  const l = AppState.currentLearner;
+
+  const el = id => document.getElementById(id);
+
+  const avatarEl = el('home-learner-avatar');
+  if (avatarEl) avatarEl.textContent = l.grade >= 5 ? '🎓' : '📖';
+
+  const nameEl = el('home-learner-name');
+  if (nameEl) nameEl.textContent = l.name;
+
+  const starsEl = el('home-stars');
+  if (starsEl) starsEl.textContent = '⭐ ' + l.stars;
+
+  const streakEl = el('home-streak');
+  if (streakEl) streakEl.textContent = '🔥 連續 ' + (l.streak || 0) + ' 天';
+
+  const tasks = Storage.getDailyTasks(l.id);
+  const todayEl = el('home-today');
+  if (todayEl) todayEl.textContent = '📖 今日 ' + (tasks.todayCorrect || 0) + ' 個';
+
+  renderDailyTasksCard(tasks);
+}
+
+function renderDailyTasksCard(tasks) {
+  const list = document.getElementById('daily-tasks-list');
+  if (!list) return;
+
+  const items = [
+    { key: 'complete5min', label: '完成5分鐘練習', done: tasks.complete5min },
+    { key: 'correct10', label: '答對10題', done: tasks.correct10 },
+    { key: 'review5words', label: '複習5個單字', done: tasks.review5words }
+  ];
+
+  list.innerHTML = items.map(item => `
+    <div class="task-item ${item.done ? 'task-done' : ''}">
+      <span class="task-check">${item.done ? '✅' : '⬜'}</span>
+      <span class="task-label">${item.label}</span>
+    </div>
+  `).join('');
+}
+
+function initHomeView() {
+  document.getElementById('btn-change-learner').addEventListener('click', () => {
+    AppState.currentLearner = null;
+    renderLearnerSelect();
+    showView('view-learner-select');
+  });
+
+  document.getElementById('btn-start-game').addEventListener('click', async () => {
+    if (!AppState.currentLearner) return;
+    const btn = document.getElementById('btn-start-game');
+    btn.disabled = true;
+    btn.textContent = '⏳ 載入中...';
+    try {
+      const words = await DataManager.loadWordsForLearner(AppState.currentLearner);
+      if (!words || words.length < 4) {
+        showToast('單字不足，請確認課程資料', 'error');
+        btn.disabled = false;
+        btn.textContent = '🎮 開始5分鐘';
+        return;
+      }
+      AppState.gameWords = words;
+      AppState.recentWrong = [];
+      AppState.answerLocked = false;
+      showView('view-game');
+      startGame();
+    } catch (e) {
+      showToast('載入失敗：' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🎮 開始5分鐘';
+    }
+  });
+
+  document.getElementById('btn-parent-mode').addEventListener('click', () => {
+    showView('view-parent');
+    renderParentView();
+  });
+
+  document.getElementById('btn-go-courses').addEventListener('click', () => {
+    showView('view-courses');
+    renderCoursesView();
+  });
+
+  document.getElementById('btn-go-achievements').addEventListener('click', () => {
+    showView('view-achievements');
+    renderAchievementsView();
+  });
+}
+
+// ── View: Game ────────────────────────────────────────────────
+
+function startGame() {
+  const learner = AppState.currentLearner;
+  Game.init(learner, AppState.gameWords, {
+    onTick: (timeLeft) => {
+      const timerEl = document.getElementById('game-timer');
+      if (timerEl) timerEl.textContent = formatTime(timeLeft);
+    },
+    onEnd: (state) => {
+      onGameEnd(state);
+    }
+  });
+
+  // Reset UI
+  const timerEl = document.getElementById('game-timer');
+  if (timerEl) timerEl.textContent = '05:00';
+  const starsEl = document.getElementById('game-stars');
+  if (starsEl) starsEl.textContent = '0';
+  const streakEl = document.getElementById('game-streak');
+  if (streakEl) streakEl.textContent = '0';
+
+  document.getElementById('game-feedback').innerHTML = '';
+
+  Game.startTimer();
+  nextQuestion();
+}
+
+function nextQuestion() {
+  AppState.answerLocked = false;
+  AppState.selectedLetters = [];
+
+  const question = Game.generateQuestion(AppState.recentWrong);
+  if (!question) {
+    showToast('無法生成題目', 'error');
+    return;
+  }
+  AppState.currentQuestion = question;
+  renderQuestion(question);
+}
+
+function renderQuestion(question) {
+  const area = document.getElementById('game-question');
+  if (!area) return;
+
+  area.classList.remove('fade-in');
+  void area.offsetWidth; // reflow
+  area.classList.add('fade-in');
+
+  switch (question.gameType) {
+    case 'choice':
+      renderChoiceQuestion(question, area);
+      break;
+    case 'listen':
+      renderListenQuestion(question, area);
+      Speech.speak(question.word.en);
+      break;
+    case 'spelling_click':
+      renderSpellingClickQuestion(question, area);
+      break;
+    case 'spelling_type':
+      renderSpellingTypeQuestion(question, area);
+      break;
+  }
+}
+
+function renderChoiceQuestion(question, area) {
+  const { word, options } = question;
+  area.innerHTML = `
+    <div class="q-choice">
+      <div class="q-zh">${escHtml(word.zh)}</div>
+      <button class="btn-speak-inline" data-word="${escHtml(word.en)}">🔊 聽發音</button>
+      <div class="game-options">
+        ${options.map((opt, i) => {
+          const letter = ['A', 'B', 'C', 'D'][i];
+          return `<button class="btn btn-option" data-answer="${escHtml(opt.en.toLowerCase())}">
+            <span class="opt-letter">${letter}</span>
+            <span class="opt-text">${escHtml(opt.en)}</span>
+          </button>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  bindChoiceOptions(area, question);
+}
+
+function renderListenQuestion(question, area) {
+  const { options } = question;
+  area.innerHTML = `
+    <div class="q-listen">
+      <div class="q-listen-prompt">🔊 請選出你聽到的單字</div>
+      <button class="btn btn-listen-again" id="btn-listen-again">🔊 再聽一次</button>
+      <div class="game-options game-options-listen">
+        ${options.map((opt, i) => {
+          const letter = ['A', 'B', 'C', 'D'][i];
+          return `<button class="btn btn-option" data-answer="${escHtml(opt.en.toLowerCase())}">
+            <span class="opt-letter">${letter}</span>
+            <span class="opt-text">${escHtml(opt.en)}</span>
+          </button>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  const btnAgain = document.getElementById('btn-listen-again');
+  if (btnAgain) btnAgain.addEventListener('click', () => Speech.speak(question.word.en));
+  bindChoiceOptions(area, question);
+}
+
+function renderSpellingClickQuestion(question, area) {
+  const { word, shuffledLetters } = question;
+  const wordLen = word.en.length;
+
+  area.innerHTML = `
+    <div class="q-spelling-click">
+      <div class="q-zh">${escHtml(word.zh)}</div>
+      <button class="btn-speak-inline" data-word="${escHtml(word.en)}">🔊</button>
+      <div class="answer-slots" id="answer-slots">
+        ${Array(wordLen).fill('<span class="answer-slot">_</span>').join('')}
+      </div>
+      <div class="letter-buttons" id="letter-buttons">
+        ${shuffledLetters.map((l, i) =>
+          `<button class="letter-btn" data-letter="${escHtml(l)}" data-idx="${i}">${escHtml(l.toUpperCase())}</button>`
+        ).join('')}
+      </div>
+      <div class="spelling-actions">
+        <button class="btn btn-secondary" id="btn-clear-spelling">✗ 清除</button>
+        <button class="btn btn-primary" id="btn-confirm-spelling">✓ 確定</button>
+      </div>
+    </div>
+  `;
+
+  // Bind speak
+  area.querySelector('.btn-speak-inline').addEventListener('click', () => Speech.speak(word.en));
+
+  // Bind slots click (remove letter)
+  bindSlotClicks();
+
+  // Bind letter buttons
+  bindLetterButtons(question);
+
+  document.getElementById('btn-clear-spelling').addEventListener('click', () => {
+    clearSpelling(question);
+  });
+
+  document.getElementById('btn-confirm-spelling').addEventListener('click', () => {
+    if (AppState.answerLocked) return;
+    const answer = AppState.selectedLetters.join('');
+    submitAnswer(question, answer);
+  });
+}
+
+function bindSlotClicks() {
+  const slotsEl = document.getElementById('answer-slots');
+  if (!slotsEl) return;
+  slotsEl.addEventListener('click', e => {
+    const slot = e.target.closest('.answer-slot.filled');
+    if (!slot) return;
+    const slotIdx = parseInt(slot.dataset.slotIdx);
+    if (isNaN(slotIdx)) return;
+    // Remove the letter at this position
+    AppState.selectedLetters.splice(slotIdx, 1);
+    // Re-enable the letter button
+    const letterIdx = slot.dataset.letterIdx;
+    if (letterIdx !== undefined) {
+      const btn = document.querySelector(`.letter-btn[data-idx="${letterIdx}"]`);
+      if (btn) btn.classList.remove('used');
+    }
+    updateAnswerSlots(AppState.currentQuestion);
+  });
+}
+
+function bindLetterButtons(question) {
+  const letterBtns = document.querySelectorAll('.letter-btn');
+  letterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (AppState.answerLocked) return;
+      if (btn.classList.contains('used')) return;
+      const letter = btn.dataset.letter;
+      const idx = btn.dataset.idx;
+      const wordLen = question.word.en.length;
+      if (AppState.selectedLetters.length >= wordLen) return;
+
+      AppState.selectedLetters.push({ letter, btnIdx: idx });
+      btn.classList.add('used');
+      updateAnswerSlots(question);
+
+      // Auto-submit when all slots filled
+      if (AppState.selectedLetters.length === wordLen) {
+        setTimeout(() => {
+          if (!AppState.answerLocked) {
+            const answer = AppState.selectedLetters.map(s => s.letter).join('');
+            submitAnswer(question, answer);
+          }
+        }, 300);
+      }
+    });
+  });
+}
+
+function updateAnswerSlots(question) {
+  const slotsEl = document.getElementById('answer-slots');
+  if (!slotsEl || !question) return;
+  const wordLen = question.word.en.length;
+  let html = '';
+  for (let i = 0; i < wordLen; i++) {
+    if (i < AppState.selectedLetters.length) {
+      const sel = AppState.selectedLetters[i];
+      html += `<span class="answer-slot filled" data-slot-idx="${i}" data-letter-idx="${sel.btnIdx}">${sel.letter.toUpperCase()}</span>`;
+    } else {
+      html += '<span class="answer-slot">_</span>';
+    }
+  }
+  slotsEl.innerHTML = html;
+}
+
+function clearSpelling(question) {
+  AppState.selectedLetters = [];
+  // Re-enable all letter buttons
+  document.querySelectorAll('.letter-btn').forEach(btn => btn.classList.remove('used'));
+  updateAnswerSlots(question);
+}
+
+function renderSpellingTypeQuestion(question, area) {
+  const { word } = question;
+  area.innerHTML = `
+    <div class="q-spelling-type">
+      <div class="q-prompt">請輸入「<strong>${escHtml(word.zh)}</strong>」的英文：</div>
+      <button class="btn-speak-inline" id="btn-type-speak">🔊 聽發音</button>
+      <input type="text" id="spelling-type-input" class="spelling-type-input" placeholder="輸入英文..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <button class="btn btn-primary btn-spelling-confirm" id="btn-type-confirm">確定</button>
+    </div>
+  `;
+
+  document.getElementById('btn-type-speak').addEventListener('click', () => Speech.speak(word.en));
+
+  const input = document.getElementById('spelling-type-input');
+  if (input) {
+    input.focus();
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('btn-type-confirm').click();
+      }
+    });
+  }
+
+  document.getElementById('btn-type-confirm').addEventListener('click', () => {
+    if (AppState.answerLocked) return;
+    const val = (input ? input.value : '').trim();
+    if (!val) { showToast('請輸入答案', 'warning'); return; }
+    submitAnswer(question, val);
+  });
+
+  // Bind inline speak buttons
+  area.querySelectorAll('.btn-speak-inline').forEach(btn => {
+    if (!btn.id) {
+      btn.addEventListener('click', () => Speech.speak(btn.dataset.word || word.en));
+    }
+  });
+}
+
+function submitAnswer(question, userAnswer) {
+  if (AppState.answerLocked) return;
+  AppState.answerLocked = true;
+
+  const result = Game.processAnswer(question, userAnswer);
+  const state = Game.getState();
+
+  // Update UI stats
+  const starsEl = document.getElementById('game-stars');
+  if (starsEl) starsEl.textContent = state.starsEarned;
+  const streakEl = document.getElementById('game-streak');
+  if (streakEl) streakEl.textContent = state.currentStreak;
+
+  if (result.correct) {
+    showFeedback(true, question.word);
+    // Track recent correct for daily tasks
+    if (!AppState.recentWrong.includes(result.wordKey)) {
+      // It's a reviewed word if it was previously wrong
+    }
+    setTimeout(() => nextQuestion(), 800);
+  } else {
+    // Add to recentWrong for priority
+    if (!AppState.recentWrong.includes(result.wordKey)) {
+      AppState.recentWrong.push(result.wordKey);
+    }
+    showFeedback(false, question.word);
+    Speech.speak(question.word.en);
+    setTimeout(() => nextQuestion(), 1200);
+  }
+}
+
+function showFeedback(correct, word) {
+  const feedback = document.getElementById('game-feedback');
+  if (!feedback) return;
+
+  if (correct) {
+    feedback.innerHTML = '<div class="feedback-correct">✨ 答對了！+1⭐</div>';
+    feedback.className = 'game-feedback feedback-show-correct';
+  } else {
+    feedback.innerHTML = `<div class="feedback-wrong">✗ 正確答案：${escHtml(word.en)}</div>`;
+    feedback.className = 'game-feedback feedback-show-wrong';
+  }
+
+  // Highlight option buttons
+  const optBtns = document.querySelectorAll('.btn-option');
+  optBtns.forEach(btn => {
+    if (btn.dataset.answer === word.en.toLowerCase()) {
+      btn.classList.add('option-correct');
+    } else if (!correct && btn.classList.contains('option-selected')) {
+      btn.classList.add('option-wrong');
+    }
+    btn.disabled = true;
+  });
+
+  setTimeout(() => {
+    feedback.className = 'game-feedback';
+    feedback.innerHTML = '';
+  }, correct ? 800 : 1200);
+}
+
+function bindChoiceOptions(area, question) {
+  area.querySelectorAll('.btn-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (AppState.answerLocked) return;
+      btn.classList.add('option-selected');
+      submitAnswer(question, btn.dataset.answer);
+    });
+  });
+
+  // Bind inline speak buttons
+  area.querySelectorAll('.btn-speak-inline').forEach(btn => {
+    btn.addEventListener('click', () => Speech.speak(btn.dataset.word || question.word.en));
+  });
+}
+
+function initGameView() {
+  // Speech rate selector
+  const rateSelect = document.getElementById('speech-rate');
+  if (rateSelect) {
+    rateSelect.addEventListener('change', () => {
+      Speech.setRate(parseFloat(rateSelect.value));
+    });
+  }
+
+  // Visibility change: pause/resume
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      Game.pauseTimer();
+    } else {
+      Game.resumeTimer();
+    }
+  });
+}
+
+function onGameEnd(state) {
+  const learner = AppState.currentLearner;
+  if (!learner) return;
+
+  // Update streak
+  const today = todayStr();
+  const yesterday = yesterdayStr();
+  let newStreak = 1;
+  if (learner.lastStudyDate === yesterday) {
+    newStreak = (learner.streak || 0) + 1;
+  } else if (learner.lastStudyDate === today) {
+    newStreak = learner.streak || 1;
+  }
+
+  // Update daily tasks
+  const tasks = Storage.getDailyTasks(learner.id);
+  tasks.complete5min = true;
+  tasks.todayCorrect = (tasks.todayCorrect || 0) + state.totalCorrect;
+  if (tasks.todayCorrect >= 10) tasks.correct10 = true;
+  tasks.todayReviewed = (tasks.todayReviewed || 0) + state.wrongWords.length;
+  if (tasks.todayReviewed >= 5 || state.wrongWords.length >= 5) tasks.review5words = true;
+
+  // Check task bonus
+  const allTasksDone = tasks.complete5min && tasks.correct10 && tasks.review5words;
+  let bonusStars = 0;
+  const prevTasks = Storage.getDailyTasks(learner.id);
+  const wasAllDone = prevTasks.complete5min && prevTasks.correct10 && prevTasks.review5words;
+  if (allTasksDone && !wasAllDone) {
+    bonusStars = 10;
+  }
+
+  const newStars = (learner.stars || 0) + state.starsEarned + bonusStars;
+
+  Storage.updateDailyTasks(learner.id, tasks);
+  Storage.updateLearner(learner.id, {
+    stars: newStars,
+    streak: newStreak,
+    lastStudyDate: today
+  });
+
+  // Check achievements
+  const freshLearner = Storage.getLearner(learner.id);
+  AppState.currentLearner = freshLearner;
+  checkAchievements(freshLearner, state);
+
+  showView('view-result');
+  renderResult(state, bonusStars, allTasksDone);
+}
+
+// ── Achievements ──────────────────────────────────────────────
+
+const ACHIEVEMENTS_DEF = [
+  {
+    id: 'first_game',
+    emoji: '🌟',
+    title: '初學者',
+    desc: '完成第一次5分鐘',
+    check: (learner, state) => state.complete5min || (learner.stars > 0)
+  },
+  {
+    id: 'streak_3',
+    emoji: '🔥',
+    title: '連續王',
+    desc: '連續學習3天',
+    check: (learner) => (learner.streak || 0) >= 3
+  },
+  {
+    id: 'perfect',
+    emoji: '💯',
+    title: '完美',
+    desc: '單次正確率100%',
+    check: (learner, state) => state && state.totalAnswered > 0 && state.totalCorrect === state.totalAnswered
+  },
+  {
+    id: 'stars50',
+    emoji: '⭐',
+    title: '星星收集者',
+    desc: '累積50顆星',
+    check: (learner) => (learner.stars || 0) >= 50
+  },
+  {
+    id: 'mastery10',
+    emoji: '📚',
+    title: '單字達人',
+    desc: '有10個單字 mastery=5',
+    check: (learner) => {
+      const wm = learner.wordMastery || {};
+      return Object.values(wm).filter(m => m.mastery >= 5).length >= 10;
+    }
+  }
+];
+
+function checkAchievements(learner, state) {
+  const unlocked = learner.achievements || [];
+  const newUnlocked = [];
+
+  for (const ach of ACHIEVEMENTS_DEF) {
+    if (unlocked.includes(ach.id)) continue;
+    if (ach.check(learner, state)) {
+      newUnlocked.push(ach.id);
+    }
+  }
+
+  if (newUnlocked.length > 0) {
+    const allAch = [...unlocked, ...newUnlocked];
+    Storage.updateLearner(learner.id, { achievements: allAch });
+    AppState.currentLearner = Storage.getLearner(learner.id);
+
+    // Show animation
+    newUnlocked.forEach((id, i) => {
+      const ach = ACHIEVEMENTS_DEF.find(a => a.id === id);
+      if (!ach) return;
+      setTimeout(() => {
+        showToast(`🎉 成就解鎖：${ach.emoji} ${ach.title}！`, 'success');
+      }, i * 800);
+    });
+  }
+}
+
+// ── View: Result ──────────────────────────────────────────────
+
+function renderResult(state, bonusStars, allTasksDone) {
+  const pct = state.totalAnswered > 0
+    ? Math.round((state.totalCorrect / state.totalAnswered) * 100)
+    : 0;
+
+  const statsEl = document.getElementById('result-stats');
+  if (statsEl) {
+    statsEl.innerHTML = `
+      <div class="result-row">📝 答題：<strong>${state.totalAnswered}</strong> 題</div>
+      <div class="result-row">✅ 答對：<strong>${state.totalCorrect}</strong> 題</div>
+      <div class="result-row">📊 正確率：<strong>${pct}%</strong></div>
+      <div class="result-row">⭐ 獲得 <strong>${state.starsEarned}</strong> 顆星</div>
+      <div class="result-row">🔥 最長連續答對 <strong>${state.maxStreak}</strong> 題</div>
+    `;
+  }
+
+  const wrongEl = document.getElementById('result-wrong-words');
+  if (wrongEl) {
+    if (state.wrongWords.length > 0) {
+      const displayWrong = state.wrongWords.slice(0, 5);
+      const wordItems = displayWrong.map(wk => {
+        const w = AppState.gameWords.find(gw => gw.en.toLowerCase() === wk);
+        return w ? `<span class="wrong-word-tag">${w.emoji || ''} ${w.en} / ${w.zh}</span>` : `<span class="wrong-word-tag">${wk}</span>`;
+      });
+      wrongEl.innerHTML = `<div class="wrong-words-title">📚 需要複習：</div>
+        <div class="wrong-words-list">${wordItems.join('')}</div>`;
+    } else {
+      wrongEl.innerHTML = '<div class="all-correct-msg">🎉 全部答對！太厲害了！</div>';
+    }
+  }
+
+  const bonusEl = document.getElementById('result-task-bonus');
+  if (bonusEl) {
+    if (allTasksDone && bonusStars > 0) {
+      bonusEl.style.display = 'block';
+      bonusEl.innerHTML = `🎉 今日任務完成！⭐ +${bonusStars}`;
+    } else {
+      bonusEl.style.display = 'none';
+    }
+  }
+}
+
+function initResultView() {
+  document.getElementById('btn-play-again').addEventListener('click', async () => {
+    if (!AppState.currentLearner) return;
+    const btn = document.getElementById('btn-play-again');
+    btn.disabled = true;
+    btn.textContent = '⏳ 載入中...';
+    try {
+      const words = await DataManager.loadWordsForLearner(AppState.currentLearner);
+      AppState.gameWords = words;
+      AppState.recentWrong = [];
+      AppState.answerLocked = false;
+      showView('view-game');
+      startGame();
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🔄 再來一次';
+    }
+  });
+
+  document.getElementById('btn-go-home').addEventListener('click', () => {
+    renderHome();
+    showView('view-home');
+  });
+}
+
+// ── View: Courses ─────────────────────────────────────────────
+
+function renderCoursesView() {
+  const learner = AppState.currentLearner;
+  if (!learner) return;
+
+  const listEl = document.getElementById('courses-list');
+  if (!listEl) return;
+
+  const courses = DataManager.getAllCoursesForGrade(learner.grade);
+  if (courses.length === 0) {
+    listEl.innerHTML = '<p class="empty-hint">尚無課程</p>';
+    return;
+  }
+
+  const wm = learner.wordMastery || {};
+  listEl.innerHTML = courses.map(c => {
+    // Count studied words (mastery > 0) for built-in courses from cached data
+    let totalWords = c.wordCount || '?';
+    let studiedCount = 0;
+
+    if (Array.isArray(c.words)) {
+      totalWords = c.words.length;
+      studiedCount = c.words.filter(w => {
+        const m = wm[w.en.toLowerCase()];
+        return m && m.mastery > 0;
+      }).length;
+    }
+
+    const pct = (typeof totalWords === 'number' && totalWords > 0)
+      ? Math.round((studiedCount / totalWords) * 100) : 0;
+
+    return `<div class="course-card card" data-course-id="${escHtml(c.id)}">
+      <div class="course-title">${escHtml(c.title)}</div>
+      <div class="course-meta">
+        <span>${typeof totalWords === 'number' ? totalWords : '?'} 個單字</span>
+        <span>已學 ${studiedCount} 個</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-label">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  listEl.querySelectorAll('.course-card').forEach(card => {
+    card.addEventListener('click', () => {
+      showCourseModal(card.dataset.courseId);
+    });
+  });
+
+  // After rendering, load words for builtin courses to show real counts
+  courses.forEach(c => {
+    DataManager.loadCourse(c.id).then(loaded => {
+      if (!loaded || !Array.isArray(loaded.words)) return;
+      const cardEl = listEl.querySelector(`[data-course-id="${c.id}"]`);
+      if (!cardEl) return;
+      const total = loaded.words.length;
+      const studied = loaded.words.filter(w => {
+        const m = wm[w.en.toLowerCase()];
+        return m && m.mastery > 0;
+      }).length;
+      const pctNew = total > 0 ? Math.round((studied / total) * 100) : 0;
+
+      const metaEl = cardEl.querySelector('.course-meta');
+      if (metaEl) metaEl.innerHTML = `<span>${total} 個單字</span><span>已學 ${studied} 個</span>`;
+      const fillEl = cardEl.querySelector('.progress-fill');
+      if (fillEl) fillEl.style.width = pctNew + '%';
+      const labelEl = cardEl.querySelector('.progress-label');
+      if (labelEl) labelEl.textContent = pctNew + '%';
+    });
+  });
+}
+
+function showCourseModal(courseId) {
+  const modal = document.getElementById('course-words-modal');
+  const titleEl = document.getElementById('course-modal-title');
+  const wordsEl = document.getElementById('course-modal-words');
+  if (!modal) return;
+
+  modal.style.display = 'flex';
+
+  DataManager.loadCourse(courseId).then(course => {
+    if (!course) {
+      titleEl.textContent = '載入失敗';
+      wordsEl.innerHTML = '<p>無法載入課程資料</p>';
+      return;
+    }
+    titleEl.textContent = course.title || courseId;
+    if (!Array.isArray(course.words) || course.words.length === 0) {
+      wordsEl.innerHTML = '<p class="empty-hint">此課程暫無單字</p>';
+      return;
+    }
+    const learner = AppState.currentLearner;
+    const wm = learner ? (learner.wordMastery || {}) : {};
+
+    wordsEl.innerHTML = `<div class="modal-word-list">
+      ${course.words.map(w => {
+        const m = wm[w.en.toLowerCase()] || { mastery: 0 };
+        let stars = '';
+        for (let i = 0; i < 5; i++) stars += i < m.mastery ? '⭐' : '☆';
+        return `<div class="modal-word-row">
+          <span class="mwr-emoji">${w.emoji || ''}</span>
+          <span class="mwr-en">${escHtml(w.en)}</span>
+          <span class="mwr-zh">${escHtml(w.zh)}</span>
+          <span class="mwr-stars">${stars}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  });
+}
+
+function initCoursesView() {
+  document.getElementById('btn-courses-back').addEventListener('click', () => {
+    showView('view-home');
+  });
+
+  document.getElementById('btn-close-course-modal').addEventListener('click', () => {
+    document.getElementById('course-words-modal').style.display = 'none';
+  });
+
+  document.getElementById('course-words-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('course-words-modal')) {
+      e.target.style.display = 'none';
+    }
+  });
+}
+
+// ── View: Achievements ────────────────────────────────────────
+
+function renderAchievementsView() {
+  const learner = AppState.currentLearner;
+  if (!learner) return;
+
+  const tasks = Storage.getDailyTasks(learner.id);
+  const fullTasksEl = document.getElementById('daily-tasks-full');
+  if (fullTasksEl) {
+    const taskItems = [
+      { label: '完成5分鐘練習', done: tasks.complete5min },
+      { label: `答對10題（目前：${tasks.todayCorrect || 0}）`, done: tasks.correct10 },
+      { label: `複習5個單字（目前：${tasks.todayReviewed || 0}）`, done: tasks.review5words }
+    ];
+    fullTasksEl.innerHTML = `<h3>🎯 今日任務</h3>
+      ${taskItems.map(t => `
+        <div class="task-item ${t.done ? 'task-done' : ''}">
+          <span class="task-check">${t.done ? '✅' : '⬜'}</span>
+          <span class="task-label">${t.label}</span>
+        </div>`).join('')}`;
+  }
+
+  const achList = document.getElementById('achievements-list');
+  if (achList) {
+    const unlocked = learner.achievements || [];
+    achList.innerHTML = ACHIEVEMENTS_DEF.map(ach => {
+      const isDone = unlocked.includes(ach.id);
+      return `<div class="achievement-badge ${isDone ? 'ach-unlocked' : 'ach-locked'}">
+        <div class="ach-emoji">${ach.emoji}</div>
+        <div class="ach-title">${ach.title}</div>
+        <div class="ach-desc">${ach.desc}</div>
+        ${isDone ? '<div class="ach-done-tag">已獲得</div>' : '<div class="ach-locked-tag">未獲得</div>'}
+      </div>`;
+    }).join('');
+  }
+}
+
+function initAchievementsView() {
+  document.getElementById('btn-achievements-back').addEventListener('click', () => {
+    showView('view-home');
+  });
+}
+
+// ── View: Parent Mode ─────────────────────────────────────────
+
+let _parentTab = 'learners';
+
+function renderParentView() {
+  renderParentTab(_parentTab);
+}
+
+function renderParentTab(tab) {
+  _parentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+
+  const content = document.getElementById('parent-tab-content');
+  if (!content) return;
+
+  if (tab === 'learners') {
+    renderParentLearnersTab(content);
+  } else if (tab === 'courses') {
+    renderParentCoursesTab(content);
+  } else if (tab === 'stats') {
+    renderParentStatsTab(content);
+  }
+}
+
+function renderParentLearnersTab(content) {
+  content.innerHTML = `
+    <div class="parent-section">
+      <h3>學習者管理</h3>
+      <div id="parent-learner-container"></div>
+      <div class="parent-add-learner card">
+        <h4>新增學習者</h4>
+        <input type="text" id="parent-new-name" class="input-field" placeholder="名字">
+        <div class="grade-select">
+          <button class="btn grade-btn" data-grade="3">三年級</button>
+          <button class="btn grade-btn" data-grade="5">五年級</button>
+        </div>
+        <input type="hidden" id="parent-new-grade" value="">
+        <button class="btn btn-primary" id="btn-parent-add-learner">➕ 新增</button>
+      </div>
+    </div>
+  `;
+
+  ParentMode.renderLearnerList(document.getElementById('parent-learner-container'));
+  bindParentLearnerEvents(content);
+
+  document.querySelectorAll('#parent-tab-content .grade-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('parent-new-grade').value = btn.dataset.grade;
+      document.querySelectorAll('#parent-tab-content .grade-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+
+  document.getElementById('btn-parent-add-learner').addEventListener('click', () => {
+    const name = document.getElementById('parent-new-name').value.trim();
+    const grade = document.getElementById('parent-new-grade').value;
+    const learner = ParentMode.addLearner(name, grade);
+    if (learner) {
+      showToast('學習者已新增', 'success');
+      document.getElementById('parent-new-name').value = '';
+      document.getElementById('parent-new-grade').value = '';
+      document.querySelectorAll('#parent-tab-content .grade-btn').forEach(b => b.classList.remove('selected'));
+      ParentMode.renderLearnerList(document.getElementById('parent-learner-container'));
+      bindParentLearnerEvents(content);
+    }
+  });
+}
+
+function bindParentLearnerEvents(content) {
+  const container = document.getElementById('parent-learner-container');
+  if (!container) return;
+
+  container.querySelectorAll('.btn-edit-learner').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const oldName = btn.dataset.name;
+      const newName = prompt('輸入新名字：', oldName);
+      if (newName === null) return;
+      if (ParentMode.editLearnerName(id, newName)) {
+        showToast('名字已更新', 'success');
+        // Update currentLearner if same
+        if (AppState.currentLearner && AppState.currentLearner.id === id) {
+          AppState.currentLearner = Storage.getLearner(id);
+        }
+        ParentMode.renderLearnerList(container);
+        bindParentLearnerEvents(content);
+      }
+    });
+  });
+
+  container.querySelectorAll('.btn-clear-learner').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const name = btn.dataset.name;
+      if (!confirm(`確定清除「${name}」的所有學習資料？\n\n包含：星星、連續天數、單字熟練度、答題紀錄、成就、每日任務。\n名字和年級不會變動。\n\n此操作不可還原。`)) return;
+      if (Storage.clearLearnerData(id)) {
+        showToast(`✅ ${name} 的學習資料已清除`, 'success');
+        if (AppState.currentLearner && AppState.currentLearner.id === id) {
+          AppState.currentLearner = Storage.getLearner(id);
+        }
+        ParentMode.renderLearnerList(container);
+        bindParentLearnerEvents(content);
+      }
+    });
+  });
+
+  container.querySelectorAll('.btn-delete-learner').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const name = btn.dataset.name;
+      if (!confirm(`確定刪除學習者「${name}」？此操作不可還原。`)) return;
+      if (ParentMode.removeLearner(id)) {
+        showToast('學習者已刪除', 'success');
+        if (AppState.currentLearner && AppState.currentLearner.id === id) {
+          AppState.currentLearner = null;
+        }
+        ParentMode.renderLearnerList(container);
+        bindParentLearnerEvents(content);
+      }
+    });
+  });
+}
+
+function renderParentCoursesTab(content) {
+  content.innerHTML = `
+    <div class="parent-section">
+      <h3>課程管理</h3>
+      <div id="parent-course-container"></div>
+      <div class="parent-add-course card">
+        <h4>新增自訂課程</h4>
+        <input type="text" id="parent-course-title" class="input-field" placeholder="課程名稱">
+        <div class="grade-select">
+          <button class="btn grade-btn" data-grade="3">三年級</button>
+          <button class="btn grade-btn" data-grade="5">五年級</button>
+        </div>
+        <input type="hidden" id="parent-course-grade" value="">
+        <label class="textarea-label">單字列表（每行一個，格式：英文 中文 emoji）：</label>
+        <textarea id="parent-course-words" class="words-textarea" placeholder="例：\napple 蘋果 🍎\nbanana 香蕉 🍌\n或用逗號/Tab分隔"></textarea>
+        <button class="btn btn-primary" id="btn-parent-add-course">➕ 新增課程</button>
+      </div>
+    </div>
+  `;
+
+  ParentMode.renderCourseList(document.getElementById('parent-course-container'));
+  bindParentCourseEvents(content);
+
+  document.querySelectorAll('#parent-tab-content .grade-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('parent-course-grade').value = btn.dataset.grade;
+      document.querySelectorAll('#parent-tab-content .grade-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+
+  document.getElementById('btn-parent-add-course').addEventListener('click', () => {
+    const title = document.getElementById('parent-course-title').value.trim();
+    const grade = document.getElementById('parent-course-grade').value;
+    const words = document.getElementById('parent-course-words').value;
+    const course = ParentMode.addCourse(title, grade, words);
+    if (course) {
+      showToast(`課程「${title}」已新增 (${course.words.length} 個單字)`, 'success');
+      document.getElementById('parent-course-title').value = '';
+      document.getElementById('parent-course-words').value = '';
+      document.getElementById('parent-course-grade').value = '';
+      document.querySelectorAll('#parent-tab-content .grade-btn').forEach(b => b.classList.remove('selected'));
+      ParentMode.renderCourseList(document.getElementById('parent-course-container'));
+      bindParentCourseEvents(content);
+    }
+  });
+}
+
+function bindParentCourseEvents(content) {
+  const container = document.getElementById('parent-course-container');
+  if (!container) return;
+
+  container.querySelectorAll('.btn-delete-course').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const title = btn.dataset.title;
+      if (!confirm(`確定刪除課程「${title}」？`)) return;
+      if (ParentMode.removeCourse(id)) {
+        showToast('課程已刪除', 'success');
+        ParentMode.renderCourseList(container);
+        bindParentCourseEvents(content);
+      }
+    });
+  });
+}
+
+function renderParentStatsTab(content) {
+  const learners = Storage.getLearners();
+  let selectHtml = '<option value="">-- 選擇學習者 --</option>';
+  learners.forEach(l => {
+    selectHtml += `<option value="${escHtml(l.id)}">${escHtml(l.name)}（${l.grade}年級）</option>`;
+  });
+
+  content.innerHTML = `
+    <div class="parent-section">
+      <h3>學習報告</h3>
+      <select id="parent-stats-learner" class="input-field">
+        ${selectHtml}
+      </select>
+      <div id="parent-stats-container" class="stats-container"></div>
+    </div>
+  `;
+
+  const sel = document.getElementById('parent-stats-learner');
+  const statsContainer = document.getElementById('parent-stats-container');
+  sel.addEventListener('change', () => {
+    if (sel.value) {
+      ParentMode.renderStats(statsContainer, sel.value);
+    } else {
+      statsContainer.innerHTML = '';
+    }
+  });
+
+  // Auto-select current learner
+  if (AppState.currentLearner) {
+    sel.value = AppState.currentLearner.id;
+    sel.dispatchEvent(new Event('change'));
+  }
+}
+
+function initParentView() {
+  document.getElementById('btn-parent-back').addEventListener('click', () => {
+    showView('view-home');
+    renderHome();
+  });
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      renderParentTab(btn.dataset.tab);
+    });
+  });
+}
+
+// ── Bootstrap ─────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Init modules
+  Speech.init();
+
+  if (!Storage.isAvailable()) {
+    showToast('⚠️ 無法使用本地儲存，進度將無法儲存', 'error');
+  }
+
+  // Init views
+  initLearnerSelectView();
+  initHomeView();
+  initGameView();
+  initResultView();
+  initCoursesView();
+  initAchievementsView();
+  initParentView();
+
+  // Load learners
+  renderLearnerSelect();
+
+  const learners = Storage.getLearners();
+  if (learners.length === 0) {
+    const hint = document.getElementById('no-learner-hint');
+    if (hint) hint.style.display = 'block';
+  }
+
+  // Show initial view
+  showView('view-learner-select');
+});

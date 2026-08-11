@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#7C3AED">
+  <meta name="description" content="英文小高手 - 5分鐘英文單字練習遊戲，適合小學生使用">
+  <title>英文小高手</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- View: Learner Select                                    -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="view-learner-select" class="view active">
+    <div class="view-header" style="justify-content:center; flex-direction:column; text-align:center; gap:0;">
+      <h1 class="app-title">⭐ 英文小高手</h1>
+      <p class="app-subtitle">選擇學習者</p>
+    </div>
+
+    <div id="learner-list" class="learner-grid"></div>
+
+    <button id="btn-add-learner" class="btn btn-primary btn-lg">➕ 新增學習者</button>
+
+    <div id="add-learner-form" class="card" style="display:none; margin-top:1rem; width:100%; max-width:360px;">
+      <h3 style="color:#4c1d95; margin-bottom:1rem;">新增學習者</h3>
+      <input type="text" id="new-learner-name" placeholder="名字（例：小三）" class="input-field" style="margin-bottom:0.5rem;">
+      <div class="grade-select">
+        <button class="btn grade-btn" data-grade="3">📖 三年級</button>
+        <button class="btn grade-btn" data-grade="5">🎓 五年級</button>
+      </div>
+      <input type="hidden" id="new-learner-grade" value="">
+      <div class="form-actions">
+        <button id="btn-confirm-add-learner" class="btn btn-primary">建立</button>
+        <button id="btn-cancel-add-learner" class="btn btn-secondary">取消</button>
+      </div>
+    </div>
+
+    <p id="no-learner-hint" class="hint-text" style="display:none;">
+      尚未新增學習者，請點上方按鈕新增 👆
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- View: Home Dashboard                                    -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="view-home" class="view">
+    <div class="view-header">
+      <button id="btn-change-learner" class="btn-back">← 換學習者</button>
+      <button id="btn-parent-mode" class="btn btn-secondary btn-sm">🔒 家長模式</button>
+    </div>
+
+    <div class="learner-profile card">
+      <div id="home-learner-avatar" class="learner-avatar">📖</div>
+      <h2 id="home-learner-name">學習者</h2>
+      <div class="stats-row">
+        <span id="home-stars">⭐ 0</span>
+        <span id="home-streak">🔥 連續 0 天</span>
+        <span id="home-today">📖 今日 0 個</span>
+      </div>
+    </div>
+
+    <button id="btn-start-game" class="btn btn-primary btn-lg btn-start">🎮 開始5分鐘</button>
+
+    <div id="daily-tasks-card" class="card">
+      <h3>🎯 今日任務</h3>
+      <div id="daily-tasks-list"></div>
+    </div>
+
+    <div class="home-nav">
+      <button id="btn-go-courses" class="btn btn-nav">📚 我的課程</button>
+      <button id="btn-go-achievements" class="btn btn-nav">🏆 我的成就</button>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- View: Game                                              -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="view-game" class="view">
+    <div class="game-header">
+      <div class="game-stat">⭐ <span id="game-stars">0</span></div>
+      <div class="game-timer" id="game-timer">05:00</div>
+      <div class="game-stat">🔥 <span id="game-streak">0</span></div>
+    </div>
+
+    <div id="game-feedback" class="game-feedback"></div>
+    <div id="game-question" class="game-question-area card"></div>
+
+    <div class="speech-controls" id="speech-controls">
+      <label>語速：
+        <select id="speech-rate">
+          <option value="0.8">慢 0.8x</option>
+          <option value="1.0" selected>正常 1.0x</option>
+          <option value="1.2">快 1.2x</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- View: Result                                            -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="view-result" class="view">
+    <div class="result-card card">
+      <div class="result-title">🎉 今日完成！</div>
+      <div id="result-stats" class="result-stats"></div>
+      <div id="result-wrong-words" class="result-wrong"></div>
+      <div id="result-task-bonus" class="result-bonus" style="display:none;"></div>
+      <div class="result-actions">
+        <button id="btn-play-again" class="btn btn-primary">🔄 再來一次</button>
+        <button id="btn-go-home" class="btn btn-secondary">🏠 回首頁</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- View: Courses                                           -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="view-courses" class="view">
+    <div class="view-header">
+      <button class="btn-back" id="btn-courses-back">← 返回</button>
+      <h2>📚 我的課程</h2>
+    </div>
+    <div id="courses-list" class="courses-grid"></div>
+
+    <!-- Course words modal -->
+    <div id="course-words-modal" class="modal" style="display:none;">
+      <div class="modal-content card">
+        <div class="modal-header">
+          <h3 id="course-modal-title"></h3>
+          <button id="btn-close-course-modal" class="btn-close">✕</button>
+        </div>
+        <div id="course-modal-words"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- View: Achievements                                      -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="view-achievements" class="view">
+    <div class="view-header">
+      <button class="btn-back" id="btn-achievements-back">← 返回</button>
+      <h2>🏆 我的成就</h2>
+    </div>
+    <div id="daily-tasks-full" class="card"></div>
+    <h3 style="align-self:flex-start; color:#4c1d95; margin-bottom:0.5rem;">成就徽章</h3>
+    <div id="achievements-list" class="achievements-grid"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- View: Parent Mode                                       -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="view-parent" class="view">
+    <div class="view-header">
+      <button class="btn-back" id="btn-parent-back">← 返回</button>
+      <h2>🔒 家長模式</h2>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="learners">學習者</button>
+      <button class="tab-btn" data-tab="courses">課程</button>
+      <button class="tab-btn" data-tab="stats">學習報告</button>
+    </div>
+    <div id="parent-tab-content" style="width:100%;"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- Scripts                                                 -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <script src="js/storage.js"></script>
+  <script src="js/speech.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/parent.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

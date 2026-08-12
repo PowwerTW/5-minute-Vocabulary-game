@@ -3,6 +3,10 @@
  * 整合所有模組
  */
 
+// ── App Version ───────────────────────────────────────────────
+// 版本號單一來源：改這裡即可。首頁會自動顯示。
+const APP_VERSION = 'v1.0.2';
+
 // ── Global State ──────────────────────────────────────────────
 
 const AppState = {
@@ -1473,6 +1477,10 @@ function initParentView() {
 document.addEventListener('DOMContentLoaded', () => {
   // Init modules
   Speech.init();
+
+  // 顯示版本號
+  const verEl = document.getElementById('app-version');
+  if (verEl) verEl.textContent = APP_VERSION;
 
   if (!Storage.isAvailable()) {
     showToast('⚠️ 無法使用本地儲存，進度將無法儲存', 'error');

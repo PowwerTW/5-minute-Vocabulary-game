@@ -1075,3 +1075,6 @@ html, body {
 
 /* ── In-game End Button ───────────────────────────────────── */
 .btn-end-game { margin: 0.5rem auto 0; display: block; }
+
+/* ── App Version ──────────────────────────────────────────── */
+.app-version { font-size: 0.8rem; color: #9ca3af; margin-top: 0.25rem; }

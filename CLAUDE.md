@@ -10,6 +10,7 @@
 - 資料儲存：瀏覽器 `localStorage`（key：`vocab_game_data_v1`）
 - 發音：瀏覽器內建 Web Speech API（`speechSynthesis`）
 - 課程資料：`data/**/*.json`，以 `fetch` 載入
+- 版本號：單一來源 `APP_VERSION`（`js/app.js` 頂端），首頁自動顯示
 
 ## 架構
 
@@ -19,9 +20,9 @@
 |------|----------|------|
 | `js/storage.js` | `Storage` | localStorage 讀寫：學習者、單字熟練度、自訂課程、每日任務 |
 | `js/speech.js` | （語音模組） | Web Speech API 封裝，優先選高品質 en-US 語音 |
-| `js/data.js` | `DataManager` | 課程載入/快取、依年級取單字、貼上文字解析 |
-| `js/game.js` | `Game` | 遊戲狀態、計時器、加權選題、出題、判分 |
-| `js/parent.js` | （家長模式） | 學習者管理、自訂課程、學習報告、清除資料 |
+| `js/data.js` | `DataManager` | 課程載入/快取、依設定/年級取單字、貼上文字解析 |
+| `js/game.js` | `Game` | 一般與複習兩種模式：狀態、計時器、加權選題、出題、判分 |
+| `js/parent.js` | `ParentMode` | 學習者管理、自訂課程、學習報告、清除資料（渲染輔助） |
 | `js/app.js` | （主控制器） | View 切換、事件綁定、串接各模組 |
 
 **載入順序有相依性**：`storage` → `speech` → `data` → `game` → `parent` → `app`。`DataManager` 依賴 `Storage`，`Game` 依賴 `Storage`，不可調換。
@@ -32,11 +33,16 @@
 
 ```
 { version, learners:[ { id, name, grade, stars, streak, lastStudyDate,
-                        achievements, wordMastery:{}, dailyTasks:{} } ],
+                        achievements, wordMastery:{}, dailyTasks:{},
+                        settings:{ selectedCourses:[], questionTypes:{} } } ],
   customCourses:[ { id, grade, title, words:[...] } ] }
 ```
 
 單字熟練度（`wordMastery[wordKey]`）：`{ mastery(0-5), correctCount, wrongCount, lastSeen, consecutiveCorrect, weight(1-10) }`。
+
+學習者設定（`settings`，見 `storage.js:getLearnerSettings`/`updateLearnerSettings`）：
+- `selectedCourses`：勾選的題庫 id 陣列。**空陣列 = 沿用該年級全部題庫**（向後相容）。
+- `questionTypes`：`{ 題型: 權重 }`，權重 0 或未列 = 關閉。**全空 = 沿用該年級預設比例**。
 
 ## 選題演算法（間隔複習）
 
@@ -51,8 +57,20 @@
 
 ## 題型比例（`game.js:_getGameTypes`）
 
+先讀學習者 `settings.questionTypes` 權重建題型池；若未設定或全為 0，才落回年級預設：
+
 - 三年級：choice 20% / listen 40% / spelling_click 40%
 - 五年級：choice 13% / listen 33% / spelling_click 27% / spelling_type 27%
+
+題型代碼：`choice`、`listen`、`spelling_click`、`spelling_type`。年級只是預設，不再寫死。
+
+## 題庫選取（`data.js:getCoursesForLearner`）
+
+`loadWordsForLearner` 依 `settings.selectedCourses` 取字：有勾選且題庫仍存在 → 只用勾選的；否則落回該年級全部題庫。
+
+## 複習模式（`game.js:initReview`）
+
+一般遊戲結算後，可用答錯的字另開一場複習回合（無計時）：`_selectNextWord` 從 `reviewRemaining` 挑字，答對移除、答錯保留，清空即通過並標記「完成一次複習」每日任務。選擇題誘答選項仍取自完整題庫，避免錯字太少湊不出四選項。
 
 ## 課程資料格式
 

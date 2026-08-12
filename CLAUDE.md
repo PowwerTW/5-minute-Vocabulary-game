@@ -4,12 +4,13 @@
 
 ## 專案概述
 
-**英文小高手** — 5 分鐘英文單字複習遊戲，純前端 SPA，零後端、零建置工具。適合小學三、五年級。直接以瀏覽器開啟 `index.html` 即可執行，或部署至 GitHub Pages。
+**英文小高手** — 5 分鐘英文單字複習遊戲，純前端 SPA，零後端、零建置工具。適合國小英語單字練習。直接以瀏覽器開啟 `index.html` 即可執行，或部署至 GitHub Pages。
 
 - 技術：原生 HTML / CSS / JavaScript（無框架、無打包器、無相依套件）
 - 資料儲存：瀏覽器 `localStorage`（key：`vocab_game_data_v1`）
 - 發音：瀏覽器內建 Web Speech API（`speechSynthesis`）
-- 課程資料：`data/**/*.json`，以 `fetch` 載入
+- 課程資料：`data/lessonNN.json`（攤平，不分年級），以 `fetch` 載入
+- **無年級概念**：學習者只選課程；題型、題庫皆可個人化設定
 - 版本號：單一來源 `APP_VERSION`（`js/app.js` 頂端），首頁自動顯示
 
 ## 架構
@@ -20,8 +21,8 @@
 |------|----------|------|
 | `js/storage.js` | `Storage` | localStorage 讀寫：學習者、單字熟練度、自訂課程、每日任務 |
 | `js/speech.js` | （語音模組） | Web Speech API 封裝，優先選高品質 en-US 語音 |
-| `js/data.js` | `DataManager` | 課程載入/快取、依設定/年級取單字、貼上文字解析 |
-| `js/game.js` | `Game` | 一般與複習兩種模式：狀態、計時器、加權選題、出題、判分 |
+| `js/data.js` | `DataManager` | 課程載入/快取、依學習者設定取單字、貼上文字解析 |
+| `js/game.js` | `Game` | 一般與複習兩種模式：狀態、計時器、加權選題、出題、判分、變化型追問 |
 | `js/parent.js` | `ParentMode` | 學習者管理、自訂課程、學習報告、清除資料（渲染輔助） |
 | `js/app.js` | （主控制器） | View 切換、事件綁定、串接各模組 |
 
@@ -32,17 +33,19 @@
 `localStorage` 單一 key（`vocab_game_data_v1`）存整包 JSON：
 
 ```
-{ version, learners:[ { id, name, grade, stars, streak, lastStudyDate,
+{ version, learners:[ { id, name, stars, streak, lastStudyDate,
                         achievements, wordMastery:{}, dailyTasks:{},
                         settings:{ selectedCourses:[], questionTypes:{} } } ],
-  customCourses:[ { id, grade, title, words:[...] } ] }
+  customCourses:[ { id, title, words:[...] } ] }
 ```
+
+（舊資料殘留的 `learner.grade` / `course.grade` 欄位會被忽略，不影響運作。）
 
 單字熟練度（`wordMastery[wordKey]`）：`{ mastery(0-5), correctCount, wrongCount, lastSeen, consecutiveCorrect, weight(1-10) }`。
 
 學習者設定（`settings`，見 `storage.js:getLearnerSettings`/`updateLearnerSettings`）：
-- `selectedCourses`：勾選的題庫 id 陣列。**空陣列 = 沿用該年級全部題庫**（向後相容）。
-- `questionTypes`：`{ 題型: 權重 }`，權重 0 或未列 = 關閉。**全空 = 沿用該年級預設比例**。
+- `selectedCourses`：勾選的題庫 id 陣列。**空陣列 = 使用全部題庫**（向後相容）。
+- `questionTypes`：`{ 題型: 權重 }`，權重 0 或未列 = 關閉。**全空 = 使用通用預設比例**。
 
 ## 選題演算法（間隔複習）
 
@@ -57,16 +60,19 @@
 
 ## 題型比例（`game.js:_getGameTypes`）
 
-先讀學習者 `settings.questionTypes` 權重建題型池；若未設定或全為 0，才落回年級預設：
+先讀學習者 `settings.questionTypes` 權重建題型池；若未設定或全為 0，才落回通用預設：
 
-- 三年級：choice 20% / listen 40% / spelling_click 40%
-- 五年級：choice 13% / listen 33% / spelling_click 27% / spelling_type 27%
+- 通用預設：choice 20% / listen 30% / spelling_click 30% / spelling_type 20%
 
-題型代碼：`choice`、`listen`、`spelling_click`、`spelling_type`。年級只是預設，不再寫死。
+題型代碼：`choice`、`listen`、`spelling_click`、`spelling_type`。不分年級。
 
 ## 題庫選取（`data.js:getCoursesForLearner`）
 
-`loadWordsForLearner` 依 `settings.selectedCourses` 取字：有勾選且題庫仍存在 → 只用勾選的；否則落回該年級全部題庫。
+`loadWordsForLearner` 依 `settings.selectedCourses` 取字：有勾選且題庫仍存在 → 只用勾選的；否則使用全部題庫。
+
+## 變化型追問（`game.js` + `app.js`）
+
+單字可帶 `variant`（複數/進行式拼法，如 `arm→arms`、`eat→eating`）。一般遊戲中，某字的原型題目答完後（不論對錯），`app.js:submitAnswer` 會把該字變化型排入 `AppState.pendingVariant`，`nextQuestion` 優先出這題。變化型題目提示為 `中文（複數/進行式）`（依 variant 是否 `ing` 結尾判斷），答案為變化拼法，共用同一套題型流程（`Game.generateQuestionForWord`）。複習模式不觸發追問。
 
 ## 複習模式（`game.js:initReview`）
 
@@ -74,12 +80,16 @@
 
 ## 課程資料格式
 
-`data/gradeN/lessonNN.json`：
+`data/lessonNN.json`（攤平於 `data/`，不分年級；目前 `lesson01`–`lesson13`）：
 
 ```json
-{ "grade": 3, "lesson": 3, "title": "Lesson 3 - 顏色",
-  "words": [ {"en":"red","zh":"紅色","emoji":"🔴","image":""} ] }
+{ "title": "Lesson 3",
+  "words": [ {"en":"arm","zh":"手臂","emoji":"","variant":"arms"} ] }
 ```
+
+- `en`：拼字答案（片語保留空格，專有名詞/縮寫保留大小寫）。
+- `emoji`：一律空字串（遊戲不顯示 emoji）。
+- `variant`：複數/進行式拼法，無則空字串；有值時觸發變化型追問。
 
 新增內建課程：加 JSON 檔 → 在 `js/data.js` 的 `BUILTIN_COURSES` 陣列註冊。家長模式亦可線上新增自訂課程（存 localStorage）。
 

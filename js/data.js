@@ -4,10 +4,19 @@
  */
 const DataManager = (() => {
   const BUILTIN_COURSES = [
-    { id: 'grade3_lesson01', grade: 3, lesson: 1, title: '三年級 Lesson 1', file: 'data/grade3/lesson01.json' },
-    { id: 'grade3_lesson02', grade: 3, lesson: 2, title: '三年級 Lesson 2', file: 'data/grade3/lesson02.json' },
-    { id: 'grade5_lesson01', grade: 5, lesson: 1, title: '五年級 Lesson 1', file: 'data/grade5/lesson01.json' },
-    { id: 'grade5_lesson02', grade: 5, lesson: 2, title: '五年級 Lesson 2', file: 'data/grade5/lesson02.json' }
+    { id: 'lesson01', title: 'Lesson 1', file: 'data/lesson01.json' },
+    { id: 'lesson02', title: 'Lesson 2', file: 'data/lesson02.json' },
+    { id: 'lesson03', title: 'Lesson 3', file: 'data/lesson03.json' },
+    { id: 'lesson04', title: 'Lesson 4', file: 'data/lesson04.json' },
+    { id: 'lesson05', title: 'Lesson 5', file: 'data/lesson05.json' },
+    { id: 'lesson06', title: 'Lesson 6', file: 'data/lesson06.json' },
+    { id: 'lesson07', title: 'Lesson 7', file: 'data/lesson07.json' },
+    { id: 'lesson08', title: 'Lesson 8', file: 'data/lesson08.json' },
+    { id: 'lesson09', title: 'Lesson 9', file: 'data/lesson09.json' },
+    { id: 'lesson10', title: 'Lesson 10', file: 'data/lesson10.json' },
+    { id: 'lesson11', title: 'Lesson 11', file: 'data/lesson11.json' },
+    { id: 'lesson12', title: 'Lesson 12', file: 'data/lesson12.json' },
+    { id: 'lesson13', title: 'Lesson 13', file: 'data/lesson13.json' }
   ];
 
   const _cache = {};
@@ -41,12 +50,6 @@ const DataManager = (() => {
     }
   }
 
-  function getAllCoursesForGrade(grade) {
-    const builtins = BUILTIN_COURSES.filter(c => c.grade === Number(grade));
-    const customs = Storage.getCustomCourses().filter(c => c.grade === Number(grade));
-    return [...builtins, ...customs];
-  }
-
   function getAllCourses() {
     const customs = Storage.getCustomCourses();
     return [...BUILTIN_COURSES, ...customs];
@@ -55,14 +58,14 @@ const DataManager = (() => {
   function getCoursesForLearner(learner) {
     const settings = Storage.getLearnerSettings(learner.id);
     const selected = settings.selectedCourses || [];
+    const all = getAllCourses();
     if (selected.length > 0) {
       // 只取仍存在的勾選題庫（避免已刪除的自訂課程殘留 id）
-      const all = getAllCourses();
       const picked = all.filter(c => selected.includes(c.id));
       if (picked.length > 0) return picked;
     }
-    // 空勾選或勾選的題庫都不存在 → 沿用該年級全部題庫
-    return getAllCoursesForGrade(learner.grade);
+    // 空勾選或勾選的題庫都不存在 → 使用全部題庫
+    return all;
   }
 
   async function loadWordsForLearner(learner) {
@@ -125,7 +128,6 @@ const DataManager = (() => {
 
   return {
     loadCourse,
-    getAllCoursesForGrade,
     getAllCourses,
     getCoursesForLearner,
     loadWordsForLearner,

@@ -110,22 +110,14 @@ const Game = (() => {
         for (let i = 0; i < w; i++) pool.push(type);
       }
       if (pool.length > 0) return pool;
-      // 未設定或全部為 0 → 落回年級預設
+      // 未設定或全部為 0 → 落回通用預設
     }
 
-    const grade = _learner ? _learner.grade : 3;
-    if (grade >= 5) {
-      return ['choice', 'choice',
-              'listen', 'listen', 'listen', 'listen', 'listen',
-              'spelling_click', 'spelling_click', 'spelling_click', 'spelling_click',
-              'spelling_type', 'spelling_type', 'spelling_type', 'spelling_type', 'spelling_type'];
-      // 13% choice, 33% listen, 27% spelling_click, 27% spelling_type
-    } else {
-      return ['choice',
-              'listen', 'listen',
-              'spelling_click', 'spelling_click'];
-      // 20% choice, 40% listen, 40% spelling_click
-    }
+    // 通用預設：choice 20% / listen 30% / spelling_click 30% / spelling_type 20%
+    return ['choice', 'choice',
+            'listen', 'listen', 'listen',
+            'spelling_click', 'spelling_click', 'spelling_click',
+            'spelling_type', 'spelling_type'];
   }
 
   function _selectNextWord(recentWrong) {
@@ -190,6 +182,15 @@ const Game = (() => {
 
   function generateQuestion(recentWrong) {
     const word = _selectNextWord(recentWrong);
+    return _buildQuestion(word);
+  }
+
+  // 針對指定單字出題（用於變化型追問）
+  function generateQuestionForWord(word) {
+    return _buildQuestion(word);
+  }
+
+  function _buildQuestion(word) {
     if (!word) return null;
 
     const types = _getGameTypes();
@@ -277,6 +278,7 @@ const Game = (() => {
   return {
     init,
     initReview,
+    generateQuestionForWord,
     startTimer,
     pauseTimer,
     resumeTimer,

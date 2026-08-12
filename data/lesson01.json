@@ -1,0 +1,317 @@
+{
+  "title": "Lesson 1",
+  "words": [
+    {
+      "en": "apple",
+      "zh": "蘋果",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "ant",
+      "zh": "螞蟻",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "boy",
+      "zh": "男孩",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "ball",
+      "zh": "球",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "cat",
+      "zh": "貓",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "car",
+      "zh": "汽車",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "dog",
+      "zh": "狗",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "desk",
+      "zh": "書桌",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "elephant",
+      "zh": "大象",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "egg",
+      "zh": "蛋",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "fish",
+      "zh": "魚",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "frog",
+      "zh": "青蛙",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "goat",
+      "zh": "山羊",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "girl",
+      "zh": "女孩",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "house",
+      "zh": "房子",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "hat",
+      "zh": "帽子",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "in",
+      "zh": "在 … 裡",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "igloo",
+      "zh": "冰屋",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "jet",
+      "zh": "噴射機",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "jar",
+      "zh": "玻璃罐",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "kite",
+      "zh": "風箏",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "king",
+      "zh": "國王",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "lollipop",
+      "zh": "棒棒糖",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "lion",
+      "zh": "獅子",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "monkey",
+      "zh": "猴子",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "milk",
+      "zh": "牛奶",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "nurse",
+      "zh": "護理師",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "nose",
+      "zh": "鼻子",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "ox",
+      "zh": "公牛",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "octopus",
+      "zh": "章魚",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "pig",
+      "zh": "豬",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "pink",
+      "zh": "粉紅色",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "queen",
+      "zh": "皇后",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "quilt",
+      "zh": "被子",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "rabbit",
+      "zh": "兔子",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "rat",
+      "zh": "老鼠",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "snake",
+      "zh": "蛇",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "sun",
+      "zh": "太陽",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "tiger",
+      "zh": "老虎",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "toe",
+      "zh": "腳趾",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "umbrella",
+      "zh": "雨傘",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "under",
+      "zh": "在 … 底下",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "violin",
+      "zh": "小提琴",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "vase",
+      "zh": "花瓶",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "window",
+      "zh": "窗戶",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "watermelon",
+      "zh": "西瓜",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "x-ray",
+      "zh": "X光",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "box",
+      "zh": "盒子",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "yo-yo",
+      "zh": "溜溜球",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "yellow",
+      "zh": "黃色",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "zebra",
+      "zh": "斑馬",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "zoo",
+      "zh": "動物園",
+      "emoji": "",
+      "variant": ""
+    }
+  ]
+}

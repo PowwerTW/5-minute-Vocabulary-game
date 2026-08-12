@@ -3,6 +3,10 @@
  * 整合所有模組
  */
 
+// ── App Version ───────────────────────────────────────────────
+// 版本號單一來源：改這裡即可。首頁會自動顯示。
+const APP_VERSION = 'v1.0.2';
+
 // ── Global State ──────────────────────────────────────────────
 
 const AppState = {
@@ -11,7 +15,10 @@ const AppState = {
   recentWrong: [],
   selectedLetters: [],
   gameWords: [],
-  answerLocked: false
+  answerLocked: false,
+  gameDuration: 300,
+  reviewMode: false,
+  reviewWords: []
 };
 
 // ── Helpers ────────────────────────────────────────────────────
@@ -203,9 +210,9 @@ function renderDailyTasksCard(tasks) {
   if (!list) return;
 
   const items = [
-    { key: 'complete5min', label: '完成5分鐘練習', done: tasks.complete5min },
+    { key: 'complete5min', label: '完成一次遊戲', done: tasks.complete5min },
     { key: 'correct10', label: '答對10題', done: tasks.correct10 },
-    { key: 'review5words', label: '複習5個單字', done: tasks.review5words }
+    { key: 'review5words', label: '完成一次複習', done: tasks.review5words }
   ];
 
   list.innerHTML = items.map(item => `
@@ -237,15 +244,12 @@ function initHomeView() {
         return;
       }
       AppState.gameWords = words;
-      AppState.recentWrong = [];
-      AppState.answerLocked = false;
-      showView('view-game');
-      startGame();
+      openDurationModal();
     } catch (e) {
       showToast('載入失敗：' + e.message, 'error');
     } finally {
       btn.disabled = false;
-      btn.textContent = '🎮 開始5分鐘';
+      btn.textContent = '🎮 開始遊戲';
     }
   });
 
@@ -265,11 +269,50 @@ function initHomeView() {
   });
 }
 
+// ── Duration Picker ───────────────────────────────────────────
+
+function openDurationModal() {
+  const modal = document.getElementById('duration-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeDurationModal() {
+  const modal = document.getElementById('duration-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function initDurationModal() {
+  document.querySelectorAll('.duration-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const min = Math.max(1, Math.min(5, parseInt(btn.dataset.min, 10) || 5));
+      AppState.gameDuration = min * 60;
+      AppState.recentWrong = [];
+      AppState.answerLocked = false;
+      closeDurationModal();
+      showView('view-game');
+      startGame();
+    });
+  });
+
+  const closeBtn = document.getElementById('btn-close-duration');
+  if (closeBtn) closeBtn.addEventListener('click', closeDurationModal);
+
+  const modal = document.getElementById('duration-modal');
+  if (modal) {
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeDurationModal();
+    });
+  }
+}
+
 // ── View: Game ────────────────────────────────────────────────
 
 function startGame() {
+  AppState.reviewMode = false;
   const learner = AppState.currentLearner;
+  const duration = AppState.gameDuration || 300;
   Game.init(learner, AppState.gameWords, {
+    duration,
     onTick: (timeLeft) => {
       const timerEl = document.getElementById('game-timer');
       if (timerEl) timerEl.textContent = formatTime(timeLeft);
@@ -280,8 +323,10 @@ function startGame() {
   });
 
   // Reset UI
+  const endBtn = document.getElementById('btn-end-game');
+  if (endBtn) endBtn.style.display = '';
   const timerEl = document.getElementById('game-timer');
-  if (timerEl) timerEl.textContent = '05:00';
+  if (timerEl) timerEl.textContent = formatTime(duration);
   const starsEl = document.getElementById('game-stars');
   if (starsEl) starsEl.textContent = '0';
   const streakEl = document.getElementById('game-streak');
@@ -291,6 +336,57 @@ function startGame() {
 
   Game.startTimer();
   nextQuestion();
+}
+
+function startReviewGame() {
+  AppState.reviewMode = true;
+  AppState.answerLocked = false;
+  AppState.selectedLetters = [];
+  AppState.recentWrong = [];
+
+  const learner = AppState.currentLearner;
+  Game.initReview(learner, AppState.gameWords, AppState.reviewWords, {
+    onEnd: () => onReviewEnd()
+  });
+
+  // 複習模式無計時，計時器欄改顯示剩餘字數
+  const starsEl = document.getElementById('game-stars');
+  if (starsEl) starsEl.textContent = '0';
+  const streakEl = document.getElementById('game-streak');
+  if (streakEl) streakEl.textContent = '0';
+  document.getElementById('game-feedback').innerHTML = '';
+
+  const endBtn = document.getElementById('btn-end-game');
+  if (endBtn) endBtn.style.display = 'none';
+
+  updateReviewHeader();
+  showView('view-game');
+  nextQuestion();
+}
+
+function updateReviewHeader() {
+  const timerEl = document.getElementById('game-timer');
+  if (!timerEl) return;
+  const state = Game.getState();
+  const left = state && state.reviewRemaining ? state.reviewRemaining.length : 0;
+  timerEl.textContent = '複習剩 ' + left;
+}
+
+function onReviewEnd() {
+  const learner = AppState.currentLearner;
+  AppState.reviewMode = false;
+
+  // 完成一次複習 → 標記每日任務
+  if (learner) {
+    const tasks = Storage.getDailyTasks(learner.id);
+    tasks.review5words = true;
+    Storage.updateDailyTasks(learner.id, tasks);
+    AppState.currentLearner = Storage.getLearner(learner.id);
+  }
+
+  showToast('🎉 複習完成！錯字全部答對了！', 'success');
+  renderHome();
+  showView('view-home');
 }
 
 function nextQuestion() {
@@ -539,6 +635,25 @@ function submitAnswer(question, userAnswer) {
   const streakEl = document.getElementById('game-streak');
   if (streakEl) streakEl.textContent = state.currentStreak;
 
+  // 複習模式：更新剩餘字數，全部答對即結束
+  if (AppState.reviewMode) {
+    updateReviewHeader();
+    const remaining = state.reviewRemaining ? state.reviewRemaining.length : 0;
+    if (result.correct) {
+      showFeedback(true, question.word);
+      if (remaining === 0) {
+        setTimeout(() => onReviewEnd(), 800);
+      } else {
+        setTimeout(() => nextQuestion(), 800);
+      }
+    } else {
+      showFeedback(false, question.word);
+      Speech.speak(question.word.en);
+      setTimeout(() => nextQuestion(), 1200);
+    }
+    return;
+  }
+
   if (result.correct) {
     showFeedback(true, question.word);
     // Track recent correct for daily tasks
@@ -610,6 +725,16 @@ function initGameView() {
     });
   }
 
+  // 結算成績：手動結束（僅一般遊戲，複習模式此鈕隱藏）
+  const btnEnd = document.getElementById('btn-end-game');
+  if (btnEnd) {
+    btnEnd.addEventListener('click', () => {
+      if (AppState.reviewMode) return;
+      Game.cleanup();
+      onGameEnd(Game.getState());
+    });
+  }
+
   // Visibility change: pause/resume
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
@@ -639,8 +764,6 @@ function onGameEnd(state) {
   tasks.complete5min = true;
   tasks.todayCorrect = (tasks.todayCorrect || 0) + state.totalCorrect;
   if (tasks.todayCorrect >= 10) tasks.correct10 = true;
-  tasks.todayReviewed = (tasks.todayReviewed || 0) + state.wrongWords.length;
-  if (tasks.todayReviewed >= 5 || state.wrongWords.length >= 5) tasks.review5words = true;
 
   // Check task bonus
   const allTasksDone = tasks.complete5min && tasks.correct10 && tasks.review5words;
@@ -676,7 +799,7 @@ const ACHIEVEMENTS_DEF = [
     id: 'first_game',
     emoji: '🌟',
     title: '初學者',
-    desc: '完成第一次5分鐘',
+    desc: '完成第一次遊戲',
     check: (learner, state) => state.complete5min || (learner.stars > 0)
   },
   {
@@ -766,7 +889,20 @@ function renderResult(state, bonusStars, allTasksDone) {
         return w ? `<span class="wrong-word-tag">${w.emoji || ''} ${w.en} / ${w.zh}</span>` : `<span class="wrong-word-tag">${wk}</span>`;
       });
       wrongEl.innerHTML = `<div class="wrong-words-title">📚 需要複習：</div>
-        <div class="wrong-words-list">${wordItems.join('')}</div>`;
+        <div class="wrong-words-list">${wordItems.join('')}</div>
+        <button class="btn btn-primary btn-review-wrong" id="btn-review-wrong">🔁 複習錯誤單字（${state.wrongWords.length}）</button>`;
+
+      const rb = document.getElementById('btn-review-wrong');
+      if (rb) {
+        rb.addEventListener('click', () => {
+          const rw = state.wrongWords
+            .map(wk => AppState.gameWords.find(w => w.en.toLowerCase() === wk))
+            .filter(Boolean);
+          if (rw.length === 0) { showToast('找不到可複習的單字', 'error'); return; }
+          AppState.reviewWords = rw;
+          startReviewGame();
+        });
+      }
     } else {
       wrongEl.innerHTML = '<div class="all-correct-msg">🎉 全部答對！太厲害了！</div>';
     }
@@ -907,10 +1043,10 @@ function showCourseModal(courseId) {
     wordsEl.innerHTML = `<div class="modal-word-list">
       ${course.words.map(w => {
         const m = wm[w.en.toLowerCase()] || { mastery: 0 };
-        let stars = '';
-        for (let i = 0; i < 5; i++) stars += i < m.mastery ? '⭐' : '☆';
+        let stars = '<span class="star-rating">';
+        for (let i = 0; i < 5; i++) stars += `<span class="star ${i < m.mastery ? 'star-on' : 'star-off'}">⭐</span>`;
+        stars += '</span>';
         return `<div class="modal-word-row">
-          <span class="mwr-emoji">${w.emoji || ''}</span>
           <span class="mwr-en">${escHtml(w.en)}</span>
           <span class="mwr-zh">${escHtml(w.zh)}</span>
           <span class="mwr-stars">${stars}</span>
@@ -946,9 +1082,9 @@ function renderAchievementsView() {
   const fullTasksEl = document.getElementById('daily-tasks-full');
   if (fullTasksEl) {
     const taskItems = [
-      { label: '完成5分鐘練習', done: tasks.complete5min },
+      { label: '完成一次遊戲', done: tasks.complete5min },
       { label: `答對10題（目前：${tasks.todayCorrect || 0}）`, done: tasks.correct10 },
-      { label: `複習5個單字（目前：${tasks.todayReviewed || 0}）`, done: tasks.review5words }
+      { label: '完成一次複習', done: tasks.review5words }
     ];
     fullTasksEl.innerHTML = `<h3>🎯 今日任務</h3>
       ${taskItems.map(t => `
@@ -1000,9 +1136,121 @@ function renderParentTab(tab) {
     renderParentLearnersTab(content);
   } else if (tab === 'courses') {
     renderParentCoursesTab(content);
+  } else if (tab === 'settings') {
+    renderParentSettingsTab(content);
   } else if (tab === 'stats') {
     renderParentStatsTab(content);
   }
+}
+
+// 題型代碼與顯示名稱
+const QUESTION_TYPE_LABELS = {
+  choice: '看中文選英文',
+  listen: '聽音辨字',
+  spelling_click: '拼字（點選）',
+  spelling_type: '拼字（打字）'
+};
+
+function renderParentSettingsTab(content) {
+  const learners = Storage.getLearners();
+  let selectHtml = '<option value="">-- 選擇學習者 --</option>';
+  learners.forEach(l => {
+    selectHtml += `<option value="${escHtml(l.id)}">${escHtml(l.name)}（${l.grade}年級）</option>`;
+  });
+
+  content.innerHTML = `
+    <div class="parent-section">
+      <h3>遊戲設定</h3>
+      <p class="hint-text" style="text-align:left;">為每個學習者自訂要出現的題庫與題型比例。</p>
+      <select id="parent-settings-learner" class="input-field">
+        ${selectHtml}
+      </select>
+      <div id="parent-settings-container"></div>
+    </div>
+  `;
+
+  const sel = document.getElementById('parent-settings-learner');
+  const container = document.getElementById('parent-settings-container');
+
+  sel.addEventListener('change', () => {
+    if (sel.value) {
+      renderSettingsForm(container, sel.value);
+    } else {
+      container.innerHTML = '';
+    }
+  });
+
+  if (AppState.currentLearner) {
+    sel.value = AppState.currentLearner.id;
+    sel.dispatchEvent(new Event('change'));
+  }
+}
+
+function renderSettingsForm(container, learnerId) {
+  const learner = Storage.getLearner(learnerId);
+  if (!learner) { container.innerHTML = '<p class="empty-hint">找不到學習者</p>'; return; }
+
+  const settings = Storage.getLearnerSettings(learnerId);
+  const selectedSet = new Set(settings.selectedCourses || []);
+  const qt = settings.questionTypes || {};
+  const courses = DataManager.getAllCourses();
+
+  const coursesHtml = courses.map(c => {
+    const checked = selectedSet.has(c.id) ? 'checked' : '';
+    return `<label class="settings-course-item">
+      <input type="checkbox" class="settings-course-cb" value="${escHtml(c.id)}" ${checked}>
+      <span class="scc-title">${escHtml(c.title)}</span>
+      <span class="scc-grade">${c.grade}年級</span>
+    </label>`;
+  }).join('');
+
+  const typesHtml = Object.keys(QUESTION_TYPE_LABELS).map(type => {
+    const val = qt[type];
+    const v = (typeof val === 'number' && val >= 0) ? val : '';
+    return `<div class="settings-type-row">
+      <span class="str-label">${QUESTION_TYPE_LABELS[type]}</span>
+      <input type="number" class="settings-type-weight input-field" data-type="${type}"
+             min="0" max="10" step="1" value="${v}" placeholder="0">
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="settings-block card">
+      <h4>要出現的題庫</h4>
+      <p class="hint-text" style="text-align:left;">不勾選任何題庫 = 使用該年級全部題庫。</p>
+      <div class="settings-course-list">${coursesHtml || '<p class="empty-hint">尚無題庫</p>'}</div>
+    </div>
+    <div class="settings-block card">
+      <h4>題型比例（權重）</h4>
+      <p class="hint-text" style="text-align:left;">數字為出現權重，0 或空白 = 關閉該題型。全部留空 = 使用該年級預設比例。</p>
+      <div class="settings-type-list">${typesHtml}</div>
+    </div>
+    <button class="btn btn-primary" id="btn-save-settings">💾 儲存設定</button>
+  `;
+
+  document.getElementById('btn-save-settings').addEventListener('click', () => {
+    const selectedCourses = Array.from(container.querySelectorAll('.settings-course-cb'))
+      .filter(cb => cb.checked).map(cb => cb.value);
+
+    const questionTypes = {};
+    container.querySelectorAll('.settings-type-weight').forEach(inp => {
+      const raw = inp.value.trim();
+      if (raw === '') return;
+      const n = Math.max(0, Math.min(10, Math.floor(Number(raw) || 0)));
+      questionTypes[inp.dataset.type] = n;
+    });
+
+    const ok = Storage.updateLearnerSettings(learnerId, { selectedCourses, questionTypes });
+    if (ok) {
+      DataManager.invalidateCache();
+      if (AppState.currentLearner && AppState.currentLearner.id === learnerId) {
+        AppState.currentLearner = Storage.getLearner(learnerId);
+      }
+      showToast('設定已儲存', 'success');
+    } else {
+      showToast('儲存失敗', 'error');
+    }
+  });
 }
 
 function renderParentLearnersTab(content) {
@@ -1206,6 +1454,13 @@ function renderParentStatsTab(content) {
 
 function initParentView() {
   document.getElementById('btn-parent-back').addEventListener('click', () => {
+    // 當前學習者已被刪除（或已無學習者）→ 回學習者選單並重繪，避免殘留舊畫面
+    if (!AppState.currentLearner || !Storage.getLearner(AppState.currentLearner.id)) {
+      AppState.currentLearner = null;
+      renderLearnerSelect();
+      showView('view-learner-select');
+      return;
+    }
     showView('view-home');
     renderHome();
   });
@@ -1223,6 +1478,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Init modules
   Speech.init();
 
+  // 顯示版本號
+  const verEl = document.getElementById('app-version');
+  if (verEl) verEl.textContent = APP_VERSION;
+
   if (!Storage.isAvailable()) {
     showToast('⚠️ 無法使用本地儲存，進度將無法儲存', 'error');
   }
@@ -1230,6 +1489,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Init views
   initLearnerSelectView();
   initHomeView();
+  initDurationModal();
   initGameView();
   initResultView();
   initCoursesView();

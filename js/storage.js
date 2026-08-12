@@ -68,7 +68,8 @@ const Storage = (() => {
       lastStudyDate: null,
       achievements: [],
       wordMastery: {},
-      dailyTasks: {}
+      dailyTasks: {},
+      settings: _defaultSettings()
     };
     data.learners = data.learners || [];
     data.learners.push(learner);
@@ -105,6 +106,36 @@ const Storage = (() => {
       wordMastery: {},
       dailyTasks: {}
     });
+    return _save(data);
+  }
+
+  // ── Learner Settings ──────────────────────────────────────
+
+  // selectedCourses 空陣列 = 沿用該年級全部題庫（向後相容）
+  // questionTypes 空物件 = 沿用該年級預設題型比例
+  function _defaultSettings() {
+    return {
+      selectedCourses: [],
+      questionTypes: {}
+    };
+  }
+
+  function getLearnerSettings(learnerId) {
+    const learner = getLearner(learnerId);
+    if (!learner) return _defaultSettings();
+    const s = learner.settings || {};
+    return {
+      selectedCourses: Array.isArray(s.selectedCourses) ? s.selectedCourses : [],
+      questionTypes: (s.questionTypes && typeof s.questionTypes === 'object') ? s.questionTypes : {}
+    };
+  }
+
+  function updateLearnerSettings(learnerId, settings) {
+    const data = _load();
+    const idx = (data.learners || []).findIndex(l => l.id === learnerId);
+    if (idx === -1) return false;
+    const cur = data.learners[idx].settings || _defaultSettings();
+    data.learners[idx].settings = Object.assign({}, cur, settings);
     return _save(data);
   }
 
@@ -225,6 +256,8 @@ const Storage = (() => {
     updateLearner,
     deleteLearner,
     clearLearnerData,
+    getLearnerSettings,
+    updateLearnerSettings,
     getWordMastery,
     updateWordMastery,
     getCustomCourses,

@@ -5,11 +5,11 @@
 const ParentMode = (() => {
 
   function _starsHtml(mastery) {
-    let html = '';
+    let html = '<span class="star-rating">';
     for (let i = 0; i < 5; i++) {
-      html += i < mastery ? '⭐' : '☆';
+      html += `<span class="star ${i < mastery ? 'star-on' : 'star-off'}">⭐</span>`;
     }
-    return html;
+    return html + '</span>';
   }
 
   function _masteryStatus(mastery) {
@@ -64,13 +64,14 @@ const ParentMode = (() => {
     let html = '<div class="parent-course-list">';
     for (const c of courses) {
       const isCustom = customIds.has(c.id);
-      const wordCount = Array.isArray(c.words) ? c.words.length : (c.wordCount || '?');
+      const known = Array.isArray(c.words) ? c.words.length : (typeof c.wordCount === 'number' ? c.wordCount : null);
+      const countText = known !== null ? `${known} 個單字` : '載入中...';
       html += `
         <div class="parent-course-item card" data-id="${c.id}">
           <div class="pci-info">
             <span class="pci-title">${escHtml(c.title)}</span>
             <span class="pci-grade">${c.grade}年級</span>
-            <span class="pci-count">${wordCount} 個單字</span>
+            <span class="pci-count" data-course-id="${escHtml(c.id)}">${countText}</span>
             ${isCustom ? '<span class="badge-custom">自訂</span>' : '<span class="badge-builtin">內建</span>'}
           </div>
           ${isCustom ? `<div class="pci-actions">
@@ -80,6 +81,17 @@ const ParentMode = (() => {
     }
     html += '</div>';
     container.innerHTML = html;
+
+    // 內建題庫未帶字數，非同步載入 JSON 後補上真實數字
+    for (const c of courses) {
+      if (Array.isArray(c.words) || typeof c.wordCount === 'number') continue;
+      DataManager.loadCourse(c.id).then(loaded => {
+        const span = container.querySelector(`.pci-count[data-course-id="${c.id}"]`);
+        if (!span) return;
+        span.textContent = (loaded && Array.isArray(loaded.words))
+          ? `${loaded.words.length} 個單字` : '無法載入';
+      });
+    }
   }
 
   function renderWordList(container, courseId) {

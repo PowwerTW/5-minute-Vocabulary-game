@@ -15,6 +15,23 @@
   <!-- Toast notification -->
   <div id="toast" class="toast" aria-live="polite"></div>
 
+  <!-- Duration picker modal -->
+  <div id="duration-modal" class="modal" style="display:none;">
+    <div class="modal-content card">
+      <div class="modal-header">
+        <h3>選擇遊戲時間</h3>
+        <button id="btn-close-duration" class="btn-close">✕</button>
+      </div>
+      <div class="duration-options">
+        <button class="btn duration-btn" data-min="1">1 分鐘</button>
+        <button class="btn duration-btn" data-min="2">2 分鐘</button>
+        <button class="btn duration-btn" data-min="3">3 分鐘</button>
+        <button class="btn duration-btn" data-min="4">4 分鐘</button>
+        <button class="btn duration-btn" data-min="5">5 分鐘</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ═══════════════════════════════════════════════════════ -->
   <!-- View: Learner Select                                    -->
   <!-- ═══════════════════════════════════════════════════════ -->
@@ -22,6 +39,7 @@
     <div class="view-header" style="justify-content:center; flex-direction:column; text-align:center; gap:0;">
       <h1 class="app-title">⭐ 英文小高手</h1>
       <p class="app-subtitle">選擇學習者</p>
+      <p class="app-version" id="app-version"></p>
     </div>
 
     <div id="learner-list" class="learner-grid"></div>
@@ -66,7 +84,7 @@
       </div>
     </div>
 
-    <button id="btn-start-game" class="btn btn-primary btn-lg btn-start">🎮 開始5分鐘</button>
+    <button id="btn-start-game" class="btn btn-primary btn-lg btn-start">🎮 開始遊戲</button>
 
     <div id="daily-tasks-card" class="card">
       <h3>🎯 今日任務</h3>
@@ -101,6 +119,8 @@
         </select>
       </label>
     </div>
+
+    <button id="btn-end-game" class="btn btn-secondary btn-sm btn-end-game">🏁 結算成績</button>
   </section>
 
   <!-- ═══════════════════════════════════════════════════════ -->
@@ -165,6 +185,7 @@
     <div class="tabs">
       <button class="tab-btn active" data-tab="learners">學習者</button>
       <button class="tab-btn" data-tab="courses">課程</button>
+      <button class="tab-btn" data-tab="settings">遊戲設定</button>
       <button class="tab-btn" data-tab="stats">學習報告</button>
     </div>
     <div id="parent-tab-content" style="width:100%;"></div>

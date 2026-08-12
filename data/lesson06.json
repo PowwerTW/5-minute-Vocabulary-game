@@ -1,213 +1,225 @@
 {
-  "title": "Lesson 2",
+  "title": "Lesson 6",
   "words": [
     {
-      "en": "boy",
-      "zh": "男孩",
+      "en": "bathroom",
+      "zh": "浴室",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "man",
-      "zh": "男人",
+      "en": "bedroom",
+      "zh": "臥房",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "student",
-      "zh": "學生",
+      "en": "kitchen",
+      "zh": "廚房",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "girl",
-      "zh": "女孩",
+      "en": "dining room",
+      "zh": "飯廳",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "woman",
-      "zh": "女人",
+      "en": "living room",
+      "zh": "客廳",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "teacher",
-      "zh": "老師",
+      "en": "yard",
+      "zh": "院子",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "grandfather",
-      "zh": "爺爺/外公",
+      "en": "basement",
+      "zh": "地下室",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "grandmother",
-      "zh": "奶奶/外婆",
+      "en": "garden",
+      "zh": "花園",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "father",
-      "zh": "爸爸",
+      "en": "parrot",
+      "zh": "鸚鵡",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "mother",
-      "zh": "媽媽",
+      "en": "snake",
+      "zh": "蛇",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "aunt",
-      "zh": "阿姨/嬸嬸/舅媽",
+      "en": "monkey",
+      "zh": "猴子",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "uncle",
-      "zh": "姨丈/叔叔/舅舅",
+      "en": "goat",
+      "zh": "山羊",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "sister",
-      "zh": "姐姐/妹妹",
+      "en": "elephant",
+      "zh": "大象",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "me",
-      "zh": "我",
+      "en": "bear",
+      "zh": "熊",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "brother",
-      "zh": "哥哥/弟弟",
+      "en": "lion",
+      "zh": "獅子",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "cousin",
-      "zh": "堂/表兄弟姐妹",
-      "emoji": "",
-      "variant": "cousins"
-    },
-    {
-      "en": "one",
-      "zh": "一",
+      "en": "hippo",
+      "zh": "河馬",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "two",
-      "zh": "二",
+      "en": "zebra",
+      "zh": "斑馬",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "three",
-      "zh": "三",
+      "en": "tiger",
+      "zh": "老虎",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "four",
-      "zh": "四",
+      "en": "fish",
+      "zh": "魚",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "five",
-      "zh": "五",
+      "en": "turtle",
+      "zh": "烏龜",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "six",
-      "zh": "六",
+      "en": "frog",
+      "zh": "青蛙",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "seven",
-      "zh": "七",
+      "en": "spider",
+      "zh": "蜘蛛",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "eight",
-      "zh": "八",
+      "en": "bird",
+      "zh": "鳥",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "nine",
-      "zh": "九",
+      "en": "hamster",
+      "zh": "倉鼠",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "ten",
-      "zh": "十",
+      "en": "bunny",
+      "zh": "小兔子",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "sad",
-      "zh": "難過的",
+      "en": "puppy",
+      "zh": "小狗",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "happy",
-      "zh": "快樂的",
+      "en": "kitten",
+      "zh": "小貓",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "chubby",
-      "zh": "圓胖的",
+      "en": "hamburger",
+      "zh": "漢堡",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "thin",
-      "zh": "瘦的",
+      "en": "french fries",
+      "zh": "薯條",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "young",
-      "zh": "年輕的",
+      "en": "chicken nuggets",
+      "zh": "雞塊",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "old",
-      "zh": "年老的",
+      "en": "onion rings",
+      "zh": "洋蔥圈",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "short",
-      "zh": "矮的",
+      "en": "fried chicken",
+      "zh": "炸雞",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "tall",
-      "zh": "高的",
+      "en": "salad",
+      "zh": "沙拉",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "cute",
-      "zh": "可愛的",
+      "en": "hot dog",
+      "zh": "熱狗",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "soda",
+      "zh": "汽水",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "cola",
+      "zh": "可樂",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "pizza",
+      "zh": "披薩",
       "emoji": "",
       "variant": ""
     }

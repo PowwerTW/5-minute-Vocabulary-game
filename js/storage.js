@@ -57,12 +57,11 @@ const Storage = (() => {
     return (data.learners || []).find(l => l.id === id) || null;
   }
 
-  function createLearner(name, grade) {
+  function createLearner(name) {
     const data = _load();
     const learner = {
       id: _genId('learner'),
       name: name.trim(),
-      grade: Number(grade),
       stars: 0,
       streak: 0,
       lastStudyDate: null,
@@ -97,7 +96,7 @@ const Storage = (() => {
     const data = _load();
     const idx = (data.learners || []).findIndex(l => l.id === id);
     if (idx === -1) return false;
-    // 保留名字和年級，清除所有學習資料
+    // 保留名字，清除所有學習資料
     data.learners[idx] = Object.assign(data.learners[idx], {
       stars: 0,
       streak: 0,
@@ -111,8 +110,8 @@ const Storage = (() => {
 
   // ── Learner Settings ──────────────────────────────────────
 
-  // selectedCourses 空陣列 = 沿用該年級全部題庫（向後相容）
-  // questionTypes 空物件 = 沿用該年級預設題型比例
+  // selectedCourses 空陣列 = 使用全部題庫（向後相容）
+  // questionTypes 空物件 = 使用預設題型比例
   function _defaultSettings() {
     return {
       selectedCourses: [],

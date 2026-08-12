@@ -30,13 +30,11 @@ const ParentMode = (() => {
 
     let html = '<div class="parent-learner-list">';
     for (const l of learners) {
-      const gradeEmoji = l.grade >= 5 ? '🎓' : '📖';
       html += `
         <div class="parent-learner-item card" data-id="${l.id}">
           <div class="pli-info">
-            <span class="pli-avatar">${gradeEmoji}</span>
+            <span class="pli-avatar">📖</span>
             <span class="pli-name">${escHtml(l.name)}</span>
-            <span class="pli-grade">${l.grade}年級</span>
             <span class="pli-stars">⭐ ${l.stars}</span>
           </div>
           <div class="pli-actions">
@@ -50,9 +48,9 @@ const ParentMode = (() => {
     container.innerHTML = html;
   }
 
-  function renderCourseList(container, grade) {
+  function renderCourseList(container) {
     if (!container) return;
-    const courses = grade ? DataManager.getAllCoursesForGrade(grade) : DataManager.getAllCourses();
+    const courses = DataManager.getAllCourses();
     const customs = Storage.getCustomCourses();
     const customIds = new Set(customs.map(c => c.id));
 
@@ -70,7 +68,6 @@ const ParentMode = (() => {
         <div class="parent-course-item card" data-id="${c.id}">
           <div class="pci-info">
             <span class="pci-title">${escHtml(c.title)}</span>
-            <span class="pci-grade">${c.grade}年級</span>
             <span class="pci-count" data-course-id="${escHtml(c.id)}">${countText}</span>
             ${isCustom ? '<span class="badge-custom">自訂</span>' : '<span class="badge-builtin">內建</span>'}
           </div>
@@ -106,8 +103,9 @@ const ParentMode = (() => {
       let html = '<div class="word-list-table">';
       html += '<div class="wlt-header"><span>英文</span><span>中文</span><span>Emoji</span></div>';
       for (const w of course.words) {
+        const variantTag = w.variant ? ` <span class="wlt-variant">(${escHtml(w.variant)})</span>` : '';
         html += `<div class="wlt-row">
-          <span class="wlt-en">${escHtml(w.en)}</span>
+          <span class="wlt-en">${escHtml(w.en)}${variantTag}</span>
           <span class="wlt-zh">${escHtml(w.zh)}</span>
           <span class="wlt-emoji">${w.emoji || ''}</span>
         </div>`;
@@ -159,13 +157,11 @@ const ParentMode = (() => {
 
   // ── Actions ───────────────────────────────────────────────
 
-  function addLearner(name, grade) {
+  function addLearner(name) {
     const n = (name || '').trim();
-    const g = Number(grade);
     if (!n) { showToast('請輸入名字', 'error'); return null; }
     if (n.length > 20) { showToast('名字太長（最多20字）', 'error'); return null; }
-    if (![3, 5].includes(g)) { showToast('請選擇年級', 'error'); return null; }
-    return Storage.createLearner(n, g);
+    return Storage.createLearner(n);
   }
 
   function editLearnerName(id, newName) {
@@ -179,18 +175,14 @@ const ParentMode = (() => {
     return Storage.deleteLearner(id);
   }
 
-  function addCourse(title, grade, wordsText) {
+  function addCourse(title, wordsText) {
     const t = (title || '').trim();
-    const g = Number(grade);
     if (!t) { showToast('請輸入課程名稱', 'error'); return null; }
-    if (![3, 5].includes(g)) { showToast('請選擇年級', 'error'); return null; }
     const words = DataManager.parseWordInput(wordsText || '');
     if (words.length === 0) { showToast('請輸入至少一個單字', 'error'); return null; }
 
     const course = {
       id: 'custom_' + Date.now(),
-      grade: g,
-      lesson: 99,
       title: t,
       words,
       wordCount: words.length

@@ -811,16 +811,17 @@ html, body {
 
 .modal-word-list { display: flex; flex-direction: column; gap: 0.5rem; }
 .modal-word-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem 0.25rem;
   border-bottom: 1px solid #f3f4f6;
 }
 .mwr-emoji { font-size: 1.5rem; width: 2rem; text-align: center; flex-shrink: 0; }
-.mwr-en { font-weight: 700; color: #1a1a2e; min-width: 80px; }
-.mwr-zh { color: #6b7280; flex: 1; }
-.mwr-stars { font-size: 0.8rem; color: #F59E0B; letter-spacing: -1px; }
+.mwr-en { font-weight: 700; color: #1a1a2e; overflow-wrap: anywhere; }
+.mwr-zh { color: #6b7280; overflow-wrap: anywhere; }
+.mwr-stars { font-size: 0.8rem; color: #F59E0B; letter-spacing: -1px; white-space: nowrap; justify-self: end; }
 
 /* ═══════════════════════════════════════════════════════════ */
 /*  VIEW: Achievements                                          */
@@ -1078,3 +1079,6 @@ html, body {
 
 /* ── App Version ──────────────────────────────────────────── */
 .app-version { font-size: 0.8rem; color: #9ca3af; margin-top: 0.25rem; }
+
+/* ── Word Variant Tag ─────────────────────────────────────── */
+.mwr-variant, .wlt-variant { font-size: 0.8rem; color: #7C3AED; margin-left: 0.35rem; }

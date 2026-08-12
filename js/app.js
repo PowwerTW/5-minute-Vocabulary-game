@@ -5,7 +5,7 @@
 
 // ── App Version ───────────────────────────────────────────────
 // 版本號單一來源：改這裡即可。首頁會自動顯示。
-const APP_VERSION = 'v1.0.2';
+const APP_VERSION = 'v1.1.1';
 
 // ── Global State ──────────────────────────────────────────────
 
@@ -18,7 +18,8 @@ const AppState = {
   answerLocked: false,
   gameDuration: 300,
   reviewMode: false,
-  reviewWords: []
+  reviewWords: [],
+  pendingVariant: null
 };
 
 // ── Helpers ────────────────────────────────────────────────────
@@ -92,11 +93,9 @@ function renderLearnerSelect() {
   } else {
     if (hint) hint.style.display = 'none';
     list.innerHTML = learners.map(l => {
-      const gradeEmoji = l.grade >= 5 ? '🎓' : '📖';
       return `<div class="learner-card card" data-id="${l.id}">
-        <div class="learner-card-avatar">${gradeEmoji}</div>
+        <div class="learner-card-avatar">📖</div>
         <div class="learner-card-name">${escHtml(l.name)}</div>
-        <div class="learner-card-grade">${l.grade}年級</div>
         <div class="learner-card-stars">⭐ ${l.stars}</div>
       </div>`;
     }).join('');
@@ -120,33 +119,20 @@ function initLearnerSelectView() {
   const btnConfirm = document.getElementById('btn-confirm-add-learner');
   const btnCancel = document.getElementById('btn-cancel-add-learner');
   const nameInput = document.getElementById('new-learner-name');
-  const gradeHidden = document.getElementById('new-learner-grade');
 
   if (btnAdd) {
     btnAdd.addEventListener('click', () => {
       form.style.display = 'block';
       btnAdd.style.display = 'none';
       nameInput.value = '';
-      gradeHidden.value = '';
-      document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('selected'));
     });
   }
-
-  document.querySelectorAll('.grade-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      gradeHidden.value = btn.dataset.grade;
-      document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-    });
-  });
 
   if (btnConfirm) {
     btnConfirm.addEventListener('click', () => {
       const name = nameInput.value.trim();
-      const grade = gradeHidden.value;
       if (!name) { showToast('請輸入名字', 'error'); return; }
-      if (!grade) { showToast('請選擇年級', 'error'); return; }
-      const learner = Storage.createLearner(name, Number(grade));
+      const learner = Storage.createLearner(name);
       form.style.display = 'none';
       btnAdd.style.display = '';
       renderLearnerSelect();
@@ -187,7 +173,7 @@ function renderHome() {
   const el = id => document.getElementById(id);
 
   const avatarEl = el('home-learner-avatar');
-  if (avatarEl) avatarEl.textContent = l.grade >= 5 ? '🎓' : '📖';
+  if (avatarEl) avatarEl.textContent = '📖';
 
   const nameEl = el('home-learner-name');
   if (nameEl) nameEl.textContent = l.name;
@@ -309,6 +295,7 @@ function initDurationModal() {
 
 function startGame() {
   AppState.reviewMode = false;
+  AppState.pendingVariant = null;
   const learner = AppState.currentLearner;
   const duration = AppState.gameDuration || 300;
   Game.init(learner, AppState.gameWords, {
@@ -343,6 +330,7 @@ function startReviewGame() {
   AppState.answerLocked = false;
   AppState.selectedLetters = [];
   AppState.recentWrong = [];
+  AppState.pendingVariant = null;
 
   const learner = AppState.currentLearner;
   Game.initReview(learner, AppState.gameWords, AppState.reviewWords, {
@@ -392,6 +380,18 @@ function onReviewEnd() {
 function nextQuestion() {
   AppState.answerLocked = false;
   AppState.selectedLetters = [];
+
+  // 有待出的變化型題目 → 先出它
+  if (AppState.pendingVariant) {
+    const vw = AppState.pendingVariant;
+    AppState.pendingVariant = null;
+    const vq = Game.generateQuestionForWord(vw);
+    if (vq) {
+      AppState.currentQuestion = vq;
+      renderQuestion(vq);
+      return;
+    }
+  }
 
   const question = Game.generateQuestion(AppState.recentWrong);
   if (!question) {
@@ -652,6 +652,18 @@ function submitAnswer(question, userAnswer) {
       setTimeout(() => nextQuestion(), 1200);
     }
     return;
+  }
+
+  // 原型題目結束後（不論對錯），若該字有變化型且本題非變化型，安排下一題出變化型
+  if (question.word && question.word.variant && !question.word._isVariant) {
+    const v = question.word.variant;
+    const label = /ing$/.test(v) ? '進行式' : '複數';
+    AppState.pendingVariant = {
+      en: v,
+      zh: (question.word.zh || '') + '（' + label + '）',
+      emoji: '',
+      _isVariant: true
+    };
   }
 
   if (result.correct) {
@@ -946,41 +958,46 @@ function initResultView() {
 
 // ── View: Courses ─────────────────────────────────────────────
 
-function renderCoursesView() {
+async function renderCoursesView() {
   const learner = AppState.currentLearner;
   if (!learner) return;
 
   const listEl = document.getElementById('courses-list');
   if (!listEl) return;
 
-  const courses = DataManager.getAllCoursesForGrade(learner.grade);
-  if (courses.length === 0) {
-    listEl.innerHTML = '<p class="empty-hint">尚無課程</p>';
+  listEl.innerHTML = '<p class="loading-hint">載入中...</p>';
+
+  const wm = learner.wordMastery || {};
+  // 只看該學習者範圍內的題庫（勾選的，或未勾選時的全部）
+  const candidates = DataManager.getCoursesForLearner(learner);
+  const shown = [];
+
+  for (const c of candidates) {
+    const course = await DataManager.loadCourse(c.id);
+    if (!course || !Array.isArray(course.words)) continue;
+    // 只顯示有學習紀錄的題庫（該題庫任一單字曾作答過）
+    const hasRecord = course.words.some(w => wm[w.en.toLowerCase()]);
+    if (!hasRecord) continue;
+    const total = course.words.length;
+    const studied = course.words.filter(w => {
+      const m = wm[w.en.toLowerCase()];
+      return m && m.mastery > 0;
+    }).length;
+    shown.push({ id: c.id, title: c.title, total, studied });
+  }
+
+  if (shown.length === 0) {
+    listEl.innerHTML = '<p class="empty-hint">還沒有學習紀錄，先玩一場遊戲吧！</p>';
     return;
   }
 
-  const wm = learner.wordMastery || {};
-  listEl.innerHTML = courses.map(c => {
-    // Count studied words (mastery > 0) for built-in courses from cached data
-    let totalWords = c.wordCount || '?';
-    let studiedCount = 0;
-
-    if (Array.isArray(c.words)) {
-      totalWords = c.words.length;
-      studiedCount = c.words.filter(w => {
-        const m = wm[w.en.toLowerCase()];
-        return m && m.mastery > 0;
-      }).length;
-    }
-
-    const pct = (typeof totalWords === 'number' && totalWords > 0)
-      ? Math.round((studiedCount / totalWords) * 100) : 0;
-
+  listEl.innerHTML = shown.map(c => {
+    const pct = c.total > 0 ? Math.round((c.studied / c.total) * 100) : 0;
     return `<div class="course-card card" data-course-id="${escHtml(c.id)}">
       <div class="course-title">${escHtml(c.title)}</div>
       <div class="course-meta">
-        <span>${typeof totalWords === 'number' ? totalWords : '?'} 個單字</span>
-        <span>已學 ${studiedCount} 個</span>
+        <span>${c.total} 個單字</span>
+        <span>已學 ${c.studied} 個</span>
       </div>
       <div class="progress-bar">
         <div class="progress-fill" style="width:${pct}%"></div>
@@ -992,28 +1009,6 @@ function renderCoursesView() {
   listEl.querySelectorAll('.course-card').forEach(card => {
     card.addEventListener('click', () => {
       showCourseModal(card.dataset.courseId);
-    });
-  });
-
-  // After rendering, load words for builtin courses to show real counts
-  courses.forEach(c => {
-    DataManager.loadCourse(c.id).then(loaded => {
-      if (!loaded || !Array.isArray(loaded.words)) return;
-      const cardEl = listEl.querySelector(`[data-course-id="${c.id}"]`);
-      if (!cardEl) return;
-      const total = loaded.words.length;
-      const studied = loaded.words.filter(w => {
-        const m = wm[w.en.toLowerCase()];
-        return m && m.mastery > 0;
-      }).length;
-      const pctNew = total > 0 ? Math.round((studied / total) * 100) : 0;
-
-      const metaEl = cardEl.querySelector('.course-meta');
-      if (metaEl) metaEl.innerHTML = `<span>${total} 個單字</span><span>已學 ${studied} 個</span>`;
-      const fillEl = cardEl.querySelector('.progress-fill');
-      if (fillEl) fillEl.style.width = pctNew + '%';
-      const labelEl = cardEl.querySelector('.progress-label');
-      if (labelEl) labelEl.textContent = pctNew + '%';
     });
   });
 }
@@ -1046,8 +1041,9 @@ function showCourseModal(courseId) {
         let stars = '<span class="star-rating">';
         for (let i = 0; i < 5; i++) stars += `<span class="star ${i < m.mastery ? 'star-on' : 'star-off'}">⭐</span>`;
         stars += '</span>';
+        const variantTag = w.variant ? `<span class="mwr-variant">${escHtml(w.variant)}</span>` : '';
         return `<div class="modal-word-row">
-          <span class="mwr-en">${escHtml(w.en)}</span>
+          <span class="mwr-en">${escHtml(w.en)}${variantTag}</span>
           <span class="mwr-zh">${escHtml(w.zh)}</span>
           <span class="mwr-stars">${stars}</span>
         </div>`;
@@ -1155,7 +1151,7 @@ function renderParentSettingsTab(content) {
   const learners = Storage.getLearners();
   let selectHtml = '<option value="">-- 選擇學習者 --</option>';
   learners.forEach(l => {
-    selectHtml += `<option value="${escHtml(l.id)}">${escHtml(l.name)}（${l.grade}年級）</option>`;
+    selectHtml += `<option value="${escHtml(l.id)}">${escHtml(l.name)}</option>`;
   });
 
   content.innerHTML = `
@@ -1200,7 +1196,6 @@ function renderSettingsForm(container, learnerId) {
     return `<label class="settings-course-item">
       <input type="checkbox" class="settings-course-cb" value="${escHtml(c.id)}" ${checked}>
       <span class="scc-title">${escHtml(c.title)}</span>
-      <span class="scc-grade">${c.grade}年級</span>
     </label>`;
   }).join('');
 
@@ -1217,12 +1212,12 @@ function renderSettingsForm(container, learnerId) {
   container.innerHTML = `
     <div class="settings-block card">
       <h4>要出現的題庫</h4>
-      <p class="hint-text" style="text-align:left;">不勾選任何題庫 = 使用該年級全部題庫。</p>
+      <p class="hint-text" style="text-align:left;">不勾選任何題庫 = 使用全部題庫。</p>
       <div class="settings-course-list">${coursesHtml || '<p class="empty-hint">尚無題庫</p>'}</div>
     </div>
     <div class="settings-block card">
       <h4>題型比例（權重）</h4>
-      <p class="hint-text" style="text-align:left;">數字為出現權重，0 或空白 = 關閉該題型。全部留空 = 使用該年級預設比例。</p>
+      <p class="hint-text" style="text-align:left;">數字為出現權重，0 或空白 = 關閉該題型。全部留空 = 使用預設比例。</p>
       <div class="settings-type-list">${typesHtml}</div>
     </div>
     <button class="btn btn-primary" id="btn-save-settings">💾 儲存設定</button>
@@ -1261,11 +1256,6 @@ function renderParentLearnersTab(content) {
       <div class="parent-add-learner card">
         <h4>新增學習者</h4>
         <input type="text" id="parent-new-name" class="input-field" placeholder="名字">
-        <div class="grade-select">
-          <button class="btn grade-btn" data-grade="3">三年級</button>
-          <button class="btn grade-btn" data-grade="5">五年級</button>
-        </div>
-        <input type="hidden" id="parent-new-grade" value="">
         <button class="btn btn-primary" id="btn-parent-add-learner">➕ 新增</button>
       </div>
     </div>
@@ -1274,23 +1264,12 @@ function renderParentLearnersTab(content) {
   ParentMode.renderLearnerList(document.getElementById('parent-learner-container'));
   bindParentLearnerEvents(content);
 
-  document.querySelectorAll('#parent-tab-content .grade-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.getElementById('parent-new-grade').value = btn.dataset.grade;
-      document.querySelectorAll('#parent-tab-content .grade-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-    });
-  });
-
   document.getElementById('btn-parent-add-learner').addEventListener('click', () => {
     const name = document.getElementById('parent-new-name').value.trim();
-    const grade = document.getElementById('parent-new-grade').value;
-    const learner = ParentMode.addLearner(name, grade);
+    const learner = ParentMode.addLearner(name);
     if (learner) {
       showToast('學習者已新增', 'success');
       document.getElementById('parent-new-name').value = '';
-      document.getElementById('parent-new-grade').value = '';
-      document.querySelectorAll('#parent-tab-content .grade-btn').forEach(b => b.classList.remove('selected'));
       ParentMode.renderLearnerList(document.getElementById('parent-learner-container'));
       bindParentLearnerEvents(content);
     }
@@ -1323,7 +1302,7 @@ function bindParentLearnerEvents(content) {
     btn.addEventListener('click', () => {
       const id = btn.dataset.id;
       const name = btn.dataset.name;
-      if (!confirm(`確定清除「${name}」的所有學習資料？\n\n包含：星星、連續天數、單字熟練度、答題紀錄、成就、每日任務。\n名字和年級不會變動。\n\n此操作不可還原。`)) return;
+      if (!confirm(`確定清除「${name}」的所有學習資料？\n\n包含：星星、連續天數、單字熟練度、答題紀錄、成就、每日任務。\n名字不會變動。\n\n此操作不可還原。`)) return;
       if (Storage.clearLearnerData(id)) {
         showToast(`✅ ${name} 的學習資料已清除`, 'success');
         if (AppState.currentLearner && AppState.currentLearner.id === id) {
@@ -1360,11 +1339,6 @@ function renderParentCoursesTab(content) {
       <div class="parent-add-course card">
         <h4>新增自訂課程</h4>
         <input type="text" id="parent-course-title" class="input-field" placeholder="課程名稱">
-        <div class="grade-select">
-          <button class="btn grade-btn" data-grade="3">三年級</button>
-          <button class="btn grade-btn" data-grade="5">五年級</button>
-        </div>
-        <input type="hidden" id="parent-course-grade" value="">
         <label class="textarea-label">單字列表（每行一個，格式：英文 中文 emoji）：</label>
         <textarea id="parent-course-words" class="words-textarea" placeholder="例：\napple 蘋果 🍎\nbanana 香蕉 🍌\n或用逗號/Tab分隔"></textarea>
         <button class="btn btn-primary" id="btn-parent-add-course">➕ 新增課程</button>
@@ -1375,25 +1349,14 @@ function renderParentCoursesTab(content) {
   ParentMode.renderCourseList(document.getElementById('parent-course-container'));
   bindParentCourseEvents(content);
 
-  document.querySelectorAll('#parent-tab-content .grade-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.getElementById('parent-course-grade').value = btn.dataset.grade;
-      document.querySelectorAll('#parent-tab-content .grade-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-    });
-  });
-
   document.getElementById('btn-parent-add-course').addEventListener('click', () => {
     const title = document.getElementById('parent-course-title').value.trim();
-    const grade = document.getElementById('parent-course-grade').value;
     const words = document.getElementById('parent-course-words').value;
-    const course = ParentMode.addCourse(title, grade, words);
+    const course = ParentMode.addCourse(title, words);
     if (course) {
       showToast(`課程「${title}」已新增 (${course.words.length} 個單字)`, 'success');
       document.getElementById('parent-course-title').value = '';
       document.getElementById('parent-course-words').value = '';
-      document.getElementById('parent-course-grade').value = '';
-      document.querySelectorAll('#parent-tab-content .grade-btn').forEach(b => b.classList.remove('selected'));
       ParentMode.renderCourseList(document.getElementById('parent-course-container'));
       bindParentCourseEvents(content);
     }
@@ -1422,7 +1385,7 @@ function renderParentStatsTab(content) {
   const learners = Storage.getLearners();
   let selectHtml = '<option value="">-- 選擇學習者 --</option>';
   learners.forEach(l => {
-    selectHtml += `<option value="${escHtml(l.id)}">${escHtml(l.name)}（${l.grade}年級）</option>`;
+    selectHtml += `<option value="${escHtml(l.id)}">${escHtml(l.name)}</option>`;
   });
 
   content.innerHTML = `

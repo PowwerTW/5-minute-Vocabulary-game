@@ -2,6 +2,8 @@
 
 適合小學三年級、五年級使用的英文單字遊戲，透過遊戲化與間隔複習幫助小孩記住英文單字。
 
+**版本 1.0.0** ｜ 變更紀錄見 [CHANGELOG.md](CHANGELOG.md)、開發者導引見 [CLAUDE.md](CLAUDE.md)
+
 **[▶ 直接玩（GitHub Pages）](#github-pages-部署)**
 
 ---
@@ -156,6 +158,14 @@ banana,香蕉
 - 現代瀏覽器（Chrome 80+、Safari 14+、Firefox 75+、Edge 80+）
 - 英文發音需要瀏覽器支援 Web Speech API（大部分桌機/行動瀏覽器已支援）
 - 不需要網路連線（首次載入 JSON 後可離線使用）
+
+---
+
+## 演化日誌
+
+依「基因疊加」原則保留歷史脈絡，完整清單見 [CHANGELOG.md](CHANGELOG.md)。
+
+- **v1.0.0（2026-08-12）** — 首個完整版本：三種題型、智慧間隔複習、星星/連續天數/每日任務/成就、家長模式、四個內建課程；新增 `CLAUDE.md`、`CHANGELOG.md`。
 
 ---
 

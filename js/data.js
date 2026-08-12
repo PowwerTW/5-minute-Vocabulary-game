@@ -52,8 +52,21 @@ const DataManager = (() => {
     return [...BUILTIN_COURSES, ...customs];
   }
 
+  function getCoursesForLearner(learner) {
+    const settings = Storage.getLearnerSettings(learner.id);
+    const selected = settings.selectedCourses || [];
+    if (selected.length > 0) {
+      // 只取仍存在的勾選題庫（避免已刪除的自訂課程殘留 id）
+      const all = getAllCourses();
+      const picked = all.filter(c => selected.includes(c.id));
+      if (picked.length > 0) return picked;
+    }
+    // 空勾選或勾選的題庫都不存在 → 沿用該年級全部題庫
+    return getAllCoursesForGrade(learner.grade);
+  }
+
   async function loadWordsForLearner(learner) {
-    const courses = getAllCoursesForGrade(learner.grade);
+    const courses = getCoursesForLearner(learner);
     const allWords = [];
     const seenEn = new Set();
 
@@ -114,6 +127,7 @@ const DataManager = (() => {
     loadCourse,
     getAllCoursesForGrade,
     getAllCourses,
+    getCoursesForLearner,
     loadWordsForLearner,
     parseWordInput,
     invalidateCache

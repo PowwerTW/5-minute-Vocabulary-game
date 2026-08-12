@@ -6,20 +6,24 @@ const Game = (() => {
   let _state = null;
   let _learner = null;
   let _allWords = [];
+  let _reviewPool = [];
   let _timer = null;
   let _onTick = null;
   let _onEnd = null;
 
   const EXTRA_LETTERS = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
-  function init(learner, words, { onTick, onEnd }) {
+  function init(learner, words, { onTick, onEnd, duration }) {
     _learner = learner;
     _allWords = words;
     _onTick = onTick || null;
     _onEnd = onEnd || null;
 
+    const secs = (typeof duration === 'number' && duration > 0) ? Math.floor(duration) : 300;
+
     _state = {
-      timeLeft: 300,
+      mode: 'normal',
+      timeLeft: secs,
       totalAnswered: 0,
       totalCorrect: 0,
       maxStreak: 0,
@@ -27,6 +31,32 @@ const Game = (() => {
       starsEarned: 0,
       wrongWords: [],
       paused: false
+    };
+
+    return _state;
+  }
+
+  // 複習模式：只練指定錯字，全部答對才結束（無計時）。
+  // allWords 供做選擇題誘答選項，reviewWords 為要複習的錯字。
+  function initReview(learner, allWords, reviewWords, { onEnd }) {
+    _learner = learner;
+    _allWords = allWords;
+    _reviewPool = reviewWords;
+    _onTick = null;
+    _onEnd = onEnd || null;
+
+    _state = {
+      mode: 'review',
+      timeLeft: 0,
+      totalAnswered: 0,
+      totalCorrect: 0,
+      maxStreak: 0,
+      currentStreak: 0,
+      starsEarned: 0,
+      wrongWords: [],
+      paused: false,
+      reviewRemaining: reviewWords.map(w => w.en.toLowerCase()),
+      reviewTotal: reviewWords.length
     };
 
     return _state;
@@ -67,7 +97,22 @@ const Game = (() => {
 
   // ── Question Generation ───────────────────────────────────
 
+  const ALL_TYPES = ['choice', 'listen', 'spelling_click', 'spelling_type'];
+
   function _getGameTypes() {
+    // 優先使用學習者自訂題型權重（0=關閉）
+    if (_learner) {
+      const settings = Storage.getLearnerSettings(_learner.id);
+      const qt = settings.questionTypes || {};
+      const pool = [];
+      for (const type of ALL_TYPES) {
+        const w = Math.max(0, Math.floor(Number(qt[type]) || 0));
+        for (let i = 0; i < w; i++) pool.push(type);
+      }
+      if (pool.length > 0) return pool;
+      // 未設定或全部為 0 → 落回年級預設
+    }
+
     const grade = _learner ? _learner.grade : 3;
     if (grade >= 5) {
       return ['choice', 'choice',
@@ -84,6 +129,16 @@ const Game = (() => {
   }
 
   function _selectNextWord(recentWrong) {
+    // 複習模式：從尚未答對的錯字中隨機挑
+    if (_state && _state.mode === 'review') {
+      const rem = _state.reviewRemaining || [];
+      if (rem.length === 0) return null;
+      const key = rem[Math.floor(Math.random() * rem.length)];
+      return _reviewPool.find(w => w.en.toLowerCase() === key)
+        || _allWords.find(w => w.en.toLowerCase() === key)
+        || null;
+    }
+
     if (!_allWords || _allWords.length === 0) return null;
 
     const now = Date.now();
@@ -207,6 +262,11 @@ const Game = (() => {
       }
     }
 
+    // 複習模式：答對才從待複習清單移除；答錯仍留著要再練
+    if (_state.mode === 'review' && correct) {
+      _state.reviewRemaining = (_state.reviewRemaining || []).filter(k => k !== wordKey);
+    }
+
     if (_learner) {
       Storage.updateWordMastery(_learner.id, wordKey, correct);
     }
@@ -216,6 +276,7 @@ const Game = (() => {
 
   return {
     init,
+    initReview,
     startTimer,
     pauseTimer,
     resumeTimer,

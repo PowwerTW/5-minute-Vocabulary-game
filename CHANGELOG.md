@@ -3,6 +3,31 @@
 本專案所有重要變更記錄於此檔。
 格式依循 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.1.0/)，版本遵循 [語意化版本](https://semver.org/lang/zh-TW/)。
 
+## [1.1.1] - 2026-08-12
+
+### Changed
+- 「我的課程」只顯示該學習者有學習紀錄的題庫（範圍取 `getCoursesForLearner`，再過濾出任一單字曾作答過的題庫）；無紀錄時顯示提示。
+- 課程單字清單改用 grid 三欄對齊，長英文自動換行，不再擠壓中文。
+
+## [1.1.0] - 2026-08-12
+
+移除年級概念、題庫擴充與單字變化型。
+
+### Added
+- 單字變化型（複數 / 進行式）追問：單字可帶 `variant`（如 `arm→arms`、`eat→eating`），答完原型題後立刻追問變化型（提示「中文（複數/進行式）」），共用同一套題型（`game.js:generateQuestionForWord`、`app.js:AppState.pendingVariant`）。
+- 課程 modal 與家長課程單字表顯示 variant。
+- 內建題庫擴充為 13 課（`data/lesson01–13.json`，共 473 字，含 18 個變化型）。
+
+### Changed
+- **移除年級概念**：學習者只選課程，不再選三/五年級；`createLearner(name)` 去 grade。
+- 題庫資料攤平至 `data/lessonNN.json`（原 `data/grade3|grade5/` 目錄移除）。
+- 題型預設不分年級，改為單一通用預設（choice 20% / listen 30% / spelling_click 30% / spelling_type 20%）。
+- 課程資料格式簡化：去 `grade`/`lesson`/`image`，新增 `variant`，`emoji` 一律留空。
+- 學習者無勾選題庫時 → 使用全部題庫；頭像固定 📖。
+
+### Removed
+- 移除首頁與家長模式的年級選擇 UI。
+
 ## [1.0.2] - 2026-08-12
 
 學習者個人化與複習流程強化。
@@ -24,6 +49,10 @@
 ### Fixed
 - 修正家長模式內建課程字數顯示「?」的 bug（改非同步載入 JSON 補真實字數）。
 - 修正刪除最後一位學習者後返回仍殘留舊畫面、需重整的 bug。
+
+[1.1.1]: https://github.com/PowwerTW/5-minute-Vocabulary-game/releases/tag/v1.1.1
+
+[1.1.0]: https://github.com/PowwerTW/5-minute-Vocabulary-game/releases/tag/v1.1.0
 
 [1.0.2]: https://github.com/PowwerTW/5-minute-Vocabulary-game/releases/tag/v1.0.2
 

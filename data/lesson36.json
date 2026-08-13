@@ -1,63 +1,63 @@
 {
-  "title": "12_一one",
+  "title": "36_晴天的sunny",
   "words": [
     {
-      "en": "one",
-      "zh": "一",
+      "en": "sunny",
+      "zh": "晴天的",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "two",
-      "zh": "二",
+      "en": "rainy",
+      "zh": "雨天的",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "three",
-      "zh": "三",
+      "en": "snowy",
+      "zh": "下雪的",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "four",
-      "zh": "四",
+      "en": "windy",
+      "zh": "颳風的",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "five",
-      "zh": "五",
+      "en": "cloudy",
+      "zh": "多雲的",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "six",
-      "zh": "六",
+      "en": "go swimming",
+      "zh": "游泳",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "seven",
-      "zh": "七",
+      "en": "go shopping",
+      "zh": "購物",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "eight",
-      "zh": "八",
+      "en": "go fishing",
+      "zh": "釣魚",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "nine",
-      "zh": "九",
+      "en": "go jogging",
+      "zh": "慢跑",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "ten",
-      "zh": "十",
+      "en": "go hiking",
+      "zh": "健行",
       "emoji": "",
       "variant": ""
     }

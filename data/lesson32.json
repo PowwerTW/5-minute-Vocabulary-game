@@ -1,0 +1,65 @@
+{
+  "title": "32_頭head",
+  "words": [
+    {
+      "en": "head",
+      "zh": "頭",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "eye",
+      "zh": "眼睛",
+      "emoji": "",
+      "variant": "eyes"
+    },
+    {
+      "en": "ear",
+      "zh": "耳朵",
+      "emoji": "",
+      "variant": "ears"
+    },
+    {
+      "en": "nose",
+      "zh": "鼻子",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "leg",
+      "zh": "腿",
+      "emoji": "",
+      "variant": "legs"
+    },
+    {
+      "en": "hand",
+      "zh": "手",
+      "emoji": "",
+      "variant": "hands"
+    },
+    {
+      "en": "arm",
+      "zh": "手臂",
+      "emoji": "",
+      "variant": "arms"
+    },
+    {
+      "en": "tooth",
+      "zh": "牙齒",
+      "emoji": "",
+      "variant": "teeth"
+    },
+    {
+      "en": "mouth",
+      "zh": "嘴巴",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "foot",
+      "zh": "腳",
+      "emoji": "",
+      "variant": "feet"
+    }
+  ]
+}

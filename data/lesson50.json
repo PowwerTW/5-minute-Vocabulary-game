@@ -1,0 +1,53 @@
+{
+  "title": "50_春天spring",
+  "words": [
+    {
+      "en": "spring",
+      "zh": "春天",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "summer",
+      "zh": "夏天",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "fall",
+      "zh": "秋天",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "winter",
+      "zh": "冬天",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "warm",
+      "zh": "溫暖的",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "hot",
+      "zh": "炎熱的",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "cool",
+      "zh": "涼爽的",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "cold",
+      "zh": "寒冷的",
+      "emoji": "",
+      "variant": ""
+    }
+  ]
+}

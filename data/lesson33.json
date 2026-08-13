@@ -1,0 +1,53 @@
+{
+  "title": "33_頭髮hair",
+  "words": [
+    {
+      "en": "hair",
+      "zh": "頭髮",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "long",
+      "zh": "長的",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "short",
+      "zh": "短的",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "curly",
+      "zh": "捲的",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "straight",
+      "zh": "直的",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "braided",
+      "zh": "編辮子的",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "blond",
+      "zh": "金髮的",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "dark",
+      "zh": "深色的",
+      "emoji": "",
+      "variant": ""
+    }
+  ]
+}

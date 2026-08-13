@@ -2,7 +2,7 @@
 
 適合國小的英文單字遊戲，透過遊戲化與間隔複習幫助小孩記住英文單字。學習者只要選課程即可開始，無年級限制。
 
-**版本 1.2.0** ｜ 變更紀錄見 [CHANGELOG.md](CHANGELOG.md)、開發者導引見 [CLAUDE.md](CLAUDE.md)
+**版本 1.3.0** ｜ 變更紀錄見 [CHANGELOG.md](CHANGELOG.md)、開發者導引見 [CLAUDE.md](CLAUDE.md)
 
 ---
 
@@ -49,10 +49,10 @@ english-word-game/
 │   ├── parent.js       ← 家長模式
 │   └── app.js          ← 主控制器
 └── data/
-    ├── lesson01.json   ← Lesson 1
-    ├── lesson02.json   ← Lesson 2
+    ├── lesson01.json   ← 01_蘋果apple
+    ├── lesson02.json   ← 02_狗dog
     ├── ...             ← （攤平，不分年級）
-    └── lesson13.json   ← Lesson 13
+    └── lesson54.json   ← 54_六十sixty
 ```
 
 ---
@@ -86,7 +86,7 @@ banana,香蕉
 
 ```json
 {
-  "title": "Lesson 14",
+  "title": "55_手臂arm",
   "words": [
     {"en": "arm", "zh": "手臂", "emoji": "", "variant": "arms"},
     {"en": "eat", "zh": "吃",   "emoji": "", "variant": "eating"},
@@ -101,7 +101,7 @@ banana,香蕉
 2. 在 `js/data.js` 的 `BUILTIN_COURSES` 陣列加入新課程：
 
 ```javascript
-{ id: 'lesson14', title: 'Lesson 14', file: 'data/lesson14.json' },
+{ id: 'lesson55', title: '55_手臂arm', file: 'data/lesson55.json' },
 ```
 
 3. 重新上傳到 GitHub，學習者下次開啟遊戲即可使用新課程。
@@ -130,6 +130,7 @@ banana,香蕉
 
 依「基因疊加」原則保留歷史脈絡，完整清單見 [CHANGELOG.md](CHANGELOG.md)。
 
+- **v1.3.0（2026-08-14）** — 題庫全面替換為「2026 Spelling Bee Team B/C」題庫（54 課、473 字），課程改用 `NN_中文英文` 命名。
 - **v1.2.0（2026-08-13）** — 遊戲時間新增「不限時」選項；新增考試模式（選課程、不限時考一輪、顯示成績、無複習）；家長模式課程卡片滑鼠移上去可預覽單字。
 - **v1.1.1（2026-08-12）** — 「我的課程」只顯示該學習者有學習紀錄的題庫；單字清單改 grid 對齊，長英文不再擠壓中文。
 - **v1.1.0（2026-08-12）** — 移除年級概念，學習者只選課程；題庫攤平至 `data/`（13 課、473 字）；新增單字變化型（複數/進行式）追問；課程清單顯示 variant。

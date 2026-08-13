@@ -1,219 +1,39 @@
 {
-  "title": "Lesson 4",
+  "title": "04_噴射機jet",
   "words": [
     {
-      "en": "hungry",
-      "zh": "餓",
+      "en": "jet",
+      "zh": "噴射機",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "thirsty",
-      "zh": "渴",
+      "en": "jar",
+      "zh": "玻璃罐",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "angry",
-      "zh": "生氣",
+      "en": "kite",
+      "zh": "風箏",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "lazy",
-      "zh": "懶惰",
+      "en": "king",
+      "zh": "國王",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "noisy",
-      "zh": "吵鬧",
+      "en": "lollipop",
+      "zh": "棒棒糖",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "quiet",
-      "zh": "安靜",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "sleepy",
-      "zh": "愛睏",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "tired",
-      "zh": "疲累",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "door",
-      "zh": "門",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "window",
-      "zh": "窗戶",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "television",
-      "zh": "電視",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "speaker",
-      "zh": "喇叭",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "whiteboard",
-      "zh": "白板",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "trash can",
-      "zh": "垃圾桶",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "table",
-      "zh": "桌子",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "fan",
-      "zh": "電風扇",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "telephone",
-      "zh": "電話",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "blackboard",
-      "zh": "黑板",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "eleven",
-      "zh": "十一",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "twelve",
-      "zh": "十二",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "thirteen",
-      "zh": "十三",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "fourteen",
-      "zh": "十四",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "fifteen",
-      "zh": "十五",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "sixteen",
-      "zh": "十六",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "seventeen",
-      "zh": "十七",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "eighteen",
-      "zh": "十八",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "nineteen",
-      "zh": "十九",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "twenty",
-      "zh": "二十",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "teddy bear",
-      "zh": "泰迪熊",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "blocks",
-      "zh": "積木",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "doll",
-      "zh": "洋娃娃",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "ball",
-      "zh": "球",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "video game",
-      "zh": "電動遊戲",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "yo-yo",
-      "zh": "溜溜球",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "board game",
-      "zh": "棋盤遊戲 / 硬紙版遊戲",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "robot",
-      "zh": "機器人",
+      "en": "lion",
+      "zh": "獅子",
       "emoji": "",
       "variant": ""
     }

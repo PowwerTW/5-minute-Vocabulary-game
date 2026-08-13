@@ -1,0 +1,53 @@
+{
+  "title": "48_中文Chinese",
+  "words": [
+    {
+      "en": "Chinese",
+      "zh": "中文",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "English",
+      "zh": "英文",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "science",
+      "zh": "科學",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "math",
+      "zh": "數學",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "P.E.",
+      "zh": "體育",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "art",
+      "zh": "美術",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "music",
+      "zh": "音樂",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "social studies",
+      "zh": "社會",
+      "emoji": "",
+      "variant": ""
+    }
+  ]
+}

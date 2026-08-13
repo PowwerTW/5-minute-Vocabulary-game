@@ -7,22 +7,26 @@ const Game = (() => {
   let _learner = null;
   let _allWords = [];
   let _reviewPool = [];
+  let _examQueue = [];
   let _timer = null;
   let _onTick = null;
   let _onEnd = null;
 
   const EXTRA_LETTERS = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
+  // duration：秒數；null/0/未提供 = 不限時（計時器改為往上數）
   function init(learner, words, { onTick, onEnd, duration }) {
     _learner = learner;
     _allWords = words;
     _onTick = onTick || null;
     _onEnd = onEnd || null;
 
-    const secs = (typeof duration === 'number' && duration > 0) ? Math.floor(duration) : 300;
+    const unlimited = !(typeof duration === 'number' && duration > 0);
+    const secs = unlimited ? 0 : Math.floor(duration);
 
     _state = {
       mode: 'normal',
+      unlimited,
       timeLeft: secs,
       totalAnswered: 0,
       totalCorrect: 0,
@@ -62,10 +66,41 @@ const Game = (() => {
     return _state;
   }
 
+  // 考試模式：依序（洗牌後）考完指定課程的所有單字各一次，無計時、不追問、不循環。
+  // examWords 同時作為誘答選項來源，僅取自該課程本身。
+  function initExam(learner, examWords, { onEnd }) {
+    _learner = learner;
+    _allWords = examWords;
+    _examQueue = _shuffle(examWords);
+    _onTick = null;
+    _onEnd = onEnd || null;
+
+    _state = {
+      mode: 'exam',
+      timeLeft: 0,
+      totalAnswered: 0,
+      totalCorrect: 0,
+      maxStreak: 0,
+      currentStreak: 0,
+      starsEarned: 0,
+      wrongWords: [],
+      paused: false,
+      examIndex: 0,
+      examTotal: examWords.length
+    };
+
+    return _state;
+  }
+
   function startTimer() {
     if (_timer) clearInterval(_timer);
     _timer = setInterval(() => {
       if (_state.paused) return;
+      if (_state.unlimited) {
+        _state.timeLeft++;
+        if (typeof _onTick === 'function') _onTick(_state.timeLeft);
+        return;
+      }
       _state.timeLeft--;
       if (typeof _onTick === 'function') _onTick(_state.timeLeft);
       if (_state.timeLeft <= 0) {
@@ -129,6 +164,11 @@ const Game = (() => {
       return _reviewPool.find(w => w.en.toLowerCase() === key)
         || _allWords.find(w => w.en.toLowerCase() === key)
         || null;
+    }
+
+    // 考試模式：依洗牌後的順序，依序出題，各字僅出現一次
+    if (_state && _state.mode === 'exam') {
+      return _examQueue[_state.examIndex] || null;
     }
 
     if (!_allWords || _allWords.length === 0) return null;
@@ -268,6 +308,11 @@ const Game = (() => {
       _state.reviewRemaining = (_state.reviewRemaining || []).filter(k => k !== wordKey);
     }
 
+    // 考試模式：不論對錯，答完就往下一題推進
+    if (_state.mode === 'exam') {
+      _state.examIndex++;
+    }
+
     if (_learner) {
       Storage.updateWordMastery(_learner.id, wordKey, correct);
     }
@@ -278,6 +323,7 @@ const Game = (() => {
   return {
     init,
     initReview,
+    initExam,
     generateQuestionForWord,
     startTimer,
     pauseTimer,

@@ -48,6 +48,13 @@ const ParentMode = (() => {
     container.innerHTML = html;
   }
 
+  function _courseWordTagsHtml(words) {
+    if (!Array.isArray(words) || words.length === 0) {
+      return '<span class="pci-tooltip-empty">尚無單字</span>';
+    }
+    return words.map(w => `<span class="pci-word-tag">${escHtml(w.en)} / ${escHtml(w.zh)}</span>`).join('');
+  }
+
   function renderCourseList(container) {
     if (!container) return;
     const courses = DataManager.getAllCourses();
@@ -64,6 +71,8 @@ const ParentMode = (() => {
       const isCustom = customIds.has(c.id);
       const known = Array.isArray(c.words) ? c.words.length : (typeof c.wordCount === 'number' ? c.wordCount : null);
       const countText = known !== null ? `${known} 個單字` : '載入中...';
+      // 自訂課程本來就已帶完整單字，可直接顯示；內建課程需等 JSON 載入完成
+      const tooltipHtml = Array.isArray(c.words) ? _courseWordTagsHtml(c.words) : '<span class="pci-tooltip-empty">載入中...</span>';
       html += `
         <div class="parent-course-item card" data-id="${c.id}">
           <div class="pci-info">
@@ -74,19 +83,23 @@ const ParentMode = (() => {
           ${isCustom ? `<div class="pci-actions">
             <button class="btn btn-sm btn-danger btn-delete-course" data-id="${c.id}" data-title="${escHtml(c.title)}">刪除</button>
           </div>` : ''}
+          <div class="pci-tooltip" data-tooltip-id="${escHtml(c.id)}">${tooltipHtml}</div>
         </div>`;
     }
     html += '</div>';
     container.innerHTML = html;
 
-    // 內建題庫未帶字數，非同步載入 JSON 後補上真實數字
+    // 內建題庫未帶字數與單字內容，非同步載入 JSON 後補上真實數字與滑鼠移上去的單字提示
     for (const c of courses) {
       if (Array.isArray(c.words) || typeof c.wordCount === 'number') continue;
       DataManager.loadCourse(c.id).then(loaded => {
-        const span = container.querySelector(`.pci-count[data-course-id="${c.id}"]`);
-        if (!span) return;
-        span.textContent = (loaded && Array.isArray(loaded.words))
-          ? `${loaded.words.length} 個單字` : '無法載入';
+        const words = (loaded && Array.isArray(loaded.words)) ? loaded.words : [];
+
+        const countSpan = container.querySelector(`.pci-count[data-course-id="${c.id}"]`);
+        if (countSpan) countSpan.textContent = words.length > 0 ? `${words.length} 個單字` : '無法載入';
+
+        const tipEl = container.querySelector(`.pci-tooltip[data-tooltip-id="${c.id}"]`);
+        if (tipEl) tipEl.innerHTML = _courseWordTagsHtml(words);
       });
     }
   }

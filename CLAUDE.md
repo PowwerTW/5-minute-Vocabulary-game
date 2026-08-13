@@ -22,7 +22,7 @@
 | `js/storage.js` | `Storage` | localStorage 讀寫：學習者、單字熟練度、自訂課程、每日任務 |
 | `js/speech.js` | （語音模組） | Web Speech API 封裝，優先選高品質 en-US 語音 |
 | `js/data.js` | `DataManager` | 課程載入/快取、依學習者設定取單字、貼上文字解析 |
-| `js/game.js` | `Game` | 一般與複習兩種模式：狀態、計時器、加權選題、出題、判分、變化型追問 |
+| `js/game.js` | `Game` | 一般／複習／考試三種模式：狀態、計時器、加權選題、出題、判分、變化型追問 |
 | `js/parent.js` | `ParentMode` | 學習者管理、自訂課程、學習報告、清除資料（渲染輔助） |
 | `js/app.js` | （主控制器） | View 切換、事件綁定、串接各模組 |
 
@@ -77,6 +77,14 @@
 ## 複習模式（`game.js:initReview`）
 
 一般遊戲結算後，可用答錯的字另開一場複習回合（無計時）：`_selectNextWord` 從 `reviewRemaining` 挑字，答對移除、答錯保留，清空即通過並標記「完成一次複習」每日任務。選擇題誘答選項仍取自完整題庫，避免錯字太少湊不出四選項。
+
+## 遊戲時間（含不限時）
+
+首頁「開始遊戲」→ 選擇遊戲時間彈窗（`#duration-modal`）：1–5 分鐘或「⏱ 不限時」。`AppState.gameDuration` 為秒數，`null` 代表不限時。`Game.init` 依此設定 `_state.unlimited`：不限時時計時器改為往上累計（`startTimer` 內 `_state.timeLeft++`），不會自動結束，需按「🏁 結算成績」手動結算。
+
+## 考試模式（`game.js:initExam`）
+
+首頁「📝 考試模式」→ 選擇要考的課程（`#exam-course-modal`，列出 `DataManager.getAllCourses()`，含內建與自訂課程）→ 該課程單字洗牌後依序出題，每字僅出現一次、不限時、不觸發變化型追問，出完顯示成績（`renderExamResult`），**沒有複習模式**。誘答選項僅取自該課程本身（見 `Game.initExam` 的 `examWords`），因此課程單字需 ≥4 個才能進入考試。考試不影響星星、連續天數、每日任務與成就，但仍會更新單字熟練度（`Storage.updateWordMastery`）。結果頁的「再來一次」會依 `AppState.wasExam` 判斷要重新開始同一場考試或一般遊戲。
 
 ## 課程資料格式
 

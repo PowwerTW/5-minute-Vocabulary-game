@@ -28,7 +28,19 @@
         <button class="btn duration-btn" data-min="3">3 分鐘</button>
         <button class="btn duration-btn" data-min="4">4 分鐘</button>
         <button class="btn duration-btn" data-min="5">5 分鐘</button>
+        <button class="btn duration-btn" data-min="0">⏱ 不限時</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Exam course picker modal -->
+  <div id="exam-course-modal" class="modal" style="display:none;">
+    <div class="modal-content card">
+      <div class="modal-header">
+        <h3>📝 選擇要考的課程</h3>
+        <button id="btn-close-exam-course" class="btn-close">✕</button>
+      </div>
+      <div id="exam-course-options" class="duration-options"></div>
     </div>
   </div>
 
@@ -80,6 +92,7 @@
     </div>
 
     <button id="btn-start-game" class="btn btn-primary btn-lg btn-start">🎮 開始遊戲</button>
+    <button id="btn-start-exam" class="btn btn-secondary btn-lg">📝 考試模式</button>
 
     <div id="daily-tasks-card" class="card">
       <h3>🎯 今日任務</h3>
@@ -123,7 +136,7 @@
   <!-- ═══════════════════════════════════════════════════════ -->
   <section id="view-result" class="view">
     <div class="result-card card">
-      <div class="result-title">🎉 今日完成！</div>
+      <div class="result-title" id="result-title">🎉 今日完成！</div>
       <div id="result-stats" class="result-stats"></div>
       <div id="result-wrong-words" class="result-wrong"></div>
       <div id="result-task-bonus" class="result-bonus" style="display:none;"></div>

@@ -19,7 +19,10 @@ const AppState = {
   gameDuration: 300,
   reviewMode: false,
   reviewWords: [],
-  pendingVariant: null
+  pendingVariant: null,
+  examMode: false,
+  wasExam: false,
+  lastExamWords: []
 };
 
 // ── Helpers ────────────────────────────────────────────────────
@@ -239,6 +242,11 @@ function initHomeView() {
     }
   });
 
+  document.getElementById('btn-start-exam').addEventListener('click', () => {
+    if (!AppState.currentLearner) return;
+    openExamCourseModal();
+  });
+
   document.getElementById('btn-parent-mode').addEventListener('click', () => {
     showView('view-parent');
     renderParentView();
@@ -268,12 +276,14 @@ function closeDurationModal() {
 }
 
 function initDurationModal() {
-  document.querySelectorAll('.duration-btn').forEach(btn => {
+  document.querySelectorAll('#duration-modal .duration-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const min = Math.max(1, Math.min(5, parseInt(btn.dataset.min, 10) || 5));
-      AppState.gameDuration = min * 60;
+      const minRaw = parseInt(btn.dataset.min, 10) || 0;
+      // 0 = 不限時
+      AppState.gameDuration = minRaw > 0 ? Math.min(5, minRaw) * 60 : null;
       AppState.recentWrong = [];
       AppState.answerLocked = false;
+      AppState.wasExam = false;
       closeDurationModal();
       showView('view-game');
       startGame();
@@ -291,18 +301,74 @@ function initDurationModal() {
   }
 }
 
+// ── Exam Mode ─────────────────────────────────────────────────
+
+function openExamCourseModal() {
+  const modal = document.getElementById('exam-course-modal');
+  const container = document.getElementById('exam-course-options');
+  if (!modal || !container) return;
+
+  const courses = DataManager.getAllCourses();
+  container.innerHTML = courses.map(c =>
+    `<button class="btn duration-btn" data-course-id="${escHtml(c.id)}">${escHtml(c.title)}</button>`
+  ).join('');
+
+  container.querySelectorAll('.duration-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        const course = await DataManager.loadCourse(btn.dataset.courseId);
+        if (!course || !Array.isArray(course.words) || course.words.length < 4) {
+          showToast('此課程單字不足，無法出題', 'error');
+          return;
+        }
+        AppState.gameWords = course.words;
+        closeExamCourseModal();
+        showView('view-game');
+        startExam();
+      } catch (e) {
+        showToast('載入失敗：' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
+  modal.style.display = 'flex';
+}
+
+function closeExamCourseModal() {
+  const modal = document.getElementById('exam-course-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function initExamCourseModal() {
+  const closeBtn = document.getElementById('btn-close-exam-course');
+  if (closeBtn) closeBtn.addEventListener('click', closeExamCourseModal);
+
+  const modal = document.getElementById('exam-course-modal');
+  if (modal) {
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeExamCourseModal();
+    });
+  }
+}
+
 // ── View: Game ────────────────────────────────────────────────
 
 function startGame() {
   AppState.reviewMode = false;
+  AppState.examMode = false;
   AppState.pendingVariant = null;
   const learner = AppState.currentLearner;
-  const duration = AppState.gameDuration || 300;
+  const duration = AppState.gameDuration; // null/0 = 不限時
   Game.init(learner, AppState.gameWords, {
     duration,
     onTick: (timeLeft) => {
       const timerEl = document.getElementById('game-timer');
-      if (timerEl) timerEl.textContent = formatTime(timeLeft);
+      if (!timerEl) return;
+      const state = Game.getState();
+      timerEl.textContent = (state && state.unlimited) ? ('⏱ ' + formatTime(timeLeft)) : formatTime(timeLeft);
     },
     onEnd: (state) => {
       onGameEnd(state);
@@ -313,7 +379,7 @@ function startGame() {
   const endBtn = document.getElementById('btn-end-game');
   if (endBtn) endBtn.style.display = '';
   const timerEl = document.getElementById('game-timer');
-  if (timerEl) timerEl.textContent = formatTime(duration);
+  if (timerEl) timerEl.textContent = duration ? formatTime(duration) : '⏱ 00:00';
   const starsEl = document.getElementById('game-stars');
   if (starsEl) starsEl.textContent = '0';
   const streakEl = document.getElementById('game-streak');
@@ -323,6 +389,40 @@ function startGame() {
 
   Game.startTimer();
   nextQuestion();
+}
+
+function startExam() {
+  AppState.reviewMode = false;
+  AppState.examMode = true;
+  AppState.answerLocked = false;
+  AppState.selectedLetters = [];
+  AppState.recentWrong = [];
+  AppState.pendingVariant = null;
+
+  const learner = AppState.currentLearner;
+  Game.initExam(learner, AppState.gameWords, {
+    onEnd: (state) => onExamEnd(state)
+  });
+
+  const starsEl = document.getElementById('game-stars');
+  if (starsEl) starsEl.textContent = '0';
+  const streakEl = document.getElementById('game-streak');
+  if (streakEl) streakEl.textContent = '0';
+  document.getElementById('game-feedback').innerHTML = '';
+
+  const endBtn = document.getElementById('btn-end-game');
+  if (endBtn) endBtn.style.display = '';
+
+  updateExamHeader();
+  nextQuestion();
+}
+
+function updateExamHeader() {
+  const timerEl = document.getElementById('game-timer');
+  if (!timerEl) return;
+  const state = Game.getState();
+  if (!state) return;
+  timerEl.textContent = '📝 ' + state.examIndex + '/' + state.examTotal;
 }
 
 function startReviewGame() {
@@ -654,6 +754,26 @@ function submitAnswer(question, userAnswer) {
     return;
   }
 
+  // 考試模式：依序作答，不追問變化型，全部考完後顯示成績
+  if (AppState.examMode) {
+    updateExamHeader();
+    const finished = state.examIndex >= state.examTotal;
+    if (result.correct) {
+      showFeedback(true, question.word);
+    } else {
+      showFeedback(false, question.word);
+      Speech.speak(question.word.en);
+    }
+    setTimeout(() => {
+      if (finished) {
+        onExamEnd(Game.getState());
+      } else {
+        nextQuestion();
+      }
+    }, result.correct ? 800 : 1200);
+    return;
+  }
+
   // 原型題目結束後（不論對錯），若該字有變化型且本題非變化型，安排下一題出變化型
   if (question.word && question.word.variant && !question.word._isVariant) {
     const v = question.word.variant;
@@ -737,13 +857,17 @@ function initGameView() {
     });
   }
 
-  // 結算成績：手動結束（僅一般遊戲，複習模式此鈕隱藏）
+  // 結算成績：手動結束（複習模式此鈕隱藏；一般遊戲/考試模式皆可提前結算）
   const btnEnd = document.getElementById('btn-end-game');
   if (btnEnd) {
     btnEnd.addEventListener('click', () => {
       if (AppState.reviewMode) return;
       Game.cleanup();
-      onGameEnd(Game.getState());
+      if (AppState.examMode) {
+        onExamEnd(Game.getState());
+      } else {
+        onGameEnd(Game.getState());
+      }
     });
   }
 
@@ -760,6 +884,8 @@ function initGameView() {
 function onGameEnd(state) {
   const learner = AppState.currentLearner;
   if (!learner) return;
+
+  AppState.wasExam = false;
 
   // Update streak
   const today = todayStr();
@@ -877,6 +1003,9 @@ function checkAchievements(learner, state) {
 // ── View: Result ──────────────────────────────────────────────
 
 function renderResult(state, bonusStars, allTasksDone) {
+  const titleEl = document.getElementById('result-title');
+  if (titleEl) titleEl.textContent = '🎉 今日完成！';
+
   const pct = state.totalAnswered > 0
     ? Math.round((state.totalCorrect / state.totalAnswered) * 100)
     : 0;
@@ -931,6 +1060,49 @@ function renderResult(state, bonusStars, allTasksDone) {
   }
 }
 
+function onExamEnd(state) {
+  AppState.examMode = false;
+  AppState.wasExam = true;
+  AppState.lastExamWords = AppState.gameWords;
+  showView('view-result');
+  renderExamResult(state);
+}
+
+function renderExamResult(state) {
+  const titleEl = document.getElementById('result-title');
+  if (titleEl) titleEl.textContent = '📝 考試結果';
+
+  const pct = state.totalAnswered > 0
+    ? Math.round((state.totalCorrect / state.totalAnswered) * 100)
+    : 0;
+
+  const statsEl = document.getElementById('result-stats');
+  if (statsEl) {
+    statsEl.innerHTML = `
+      <div class="result-row">📝 作答：<strong>${state.totalAnswered}</strong> / ${state.examTotal} 題</div>
+      <div class="result-row">✅ 答對：<strong>${state.totalCorrect}</strong> 題</div>
+      <div class="result-row">📊 正確率：<strong>${pct}%</strong></div>
+    `;
+  }
+
+  const wrongEl = document.getElementById('result-wrong-words');
+  if (wrongEl) {
+    if (state.wrongWords.length > 0) {
+      const wordItems = state.wrongWords.map(wk => {
+        const w = AppState.gameWords.find(gw => gw.en.toLowerCase() === wk);
+        return w ? `<span class="wrong-word-tag">${escHtml(w.en)} / ${escHtml(w.zh)}</span>` : `<span class="wrong-word-tag">${escHtml(wk)}</span>`;
+      });
+      wrongEl.innerHTML = `<div class="wrong-words-title">📚 答錯的單字：</div>
+        <div class="wrong-words-list">${wordItems.join('')}</div>`;
+    } else {
+      wrongEl.innerHTML = '<div class="all-correct-msg">🎉 全部答對！太厲害了！</div>';
+    }
+  }
+
+  const bonusEl = document.getElementById('result-task-bonus');
+  if (bonusEl) bonusEl.style.display = 'none';
+}
+
 function initResultView() {
   document.getElementById('btn-play-again').addEventListener('click', async () => {
     if (!AppState.currentLearner) return;
@@ -938,12 +1110,18 @@ function initResultView() {
     btn.disabled = true;
     btn.textContent = '⏳ 載入中...';
     try {
-      const words = await DataManager.loadWordsForLearner(AppState.currentLearner);
-      AppState.gameWords = words;
-      AppState.recentWrong = [];
-      AppState.answerLocked = false;
-      showView('view-game');
-      startGame();
+      if (AppState.wasExam) {
+        AppState.gameWords = AppState.lastExamWords;
+        showView('view-game');
+        startExam();
+      } else {
+        const words = await DataManager.loadWordsForLearner(AppState.currentLearner);
+        AppState.gameWords = words;
+        AppState.recentWrong = [];
+        AppState.answerLocked = false;
+        showView('view-game');
+        startGame();
+      }
     } finally {
       btn.disabled = false;
       btn.textContent = '🔄 再來一次';
@@ -1453,6 +1631,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLearnerSelectView();
   initHomeView();
   initDurationModal();
+  initExamCourseModal();
   initGameView();
   initResultView();
   initCoursesView();

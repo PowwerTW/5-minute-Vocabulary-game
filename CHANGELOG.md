@@ -3,6 +3,13 @@
 本專案所有重要變更記錄於此檔。
 格式依循 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.1.0/)，版本遵循 [語意化版本](https://semver.org/lang/zh-TW/)。
 
+## [1.2.0] - 2026-08-13
+
+### Added
+- 遊戲時間彈窗新增「⏱ 不限時」選項：計時器改為往上累計，不會自動結束，需按「🏁 結算成績」手動結算（`game.js:init` 的 `unlimited` 旗標）。
+- 新增「📝 考試模式」：首頁選擇課程後，該課程單字洗牌依序出題各一次、不限時、不觸發變化型追問，考完顯示成績，無複習模式（`game.js:initExam`、`app.js:startExam`/`onExamEnd`）。
+- 家長模式課程分頁：滑鼠移到課程卡片上會顯示該課程完整單字清單（`parent.js:renderCourseList`）。
+
 ## [1.1.1] - 2026-08-12
 
 ### Changed
@@ -49,6 +56,8 @@
 ### Fixed
 - 修正家長模式內建課程字數顯示「?」的 bug（改非同步載入 JSON 補真實字數）。
 - 修正刪除最後一位學習者後返回仍殘留舊畫面、需重整的 bug。
+
+[1.2.0]: https://github.com/PowwerTW/5-minute-Vocabulary-game/releases/tag/v1.2.0
 
 [1.1.1]: https://github.com/PowwerTW/5-minute-Vocabulary-game/releases/tag/v1.1.1
 

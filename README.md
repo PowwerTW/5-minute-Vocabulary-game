@@ -2,20 +2,19 @@
 
 適合國小的英文單字遊戲，透過遊戲化與間隔複習幫助小孩記住英文單字。學習者只要選課程即可開始，無年級限制。
 
-**版本 1.1.1** ｜ 變更紀錄見 [CHANGELOG.md](CHANGELOG.md)、開發者導引見 [CLAUDE.md](CLAUDE.md)
-
-**[▶ 直接玩（GitHub Pages）](#github-pages-部署)**
+**版本 1.2.0** ｜ 變更紀錄見 [CHANGELOG.md](CHANGELOG.md)、開發者導引見 [CLAUDE.md](CLAUDE.md)
 
 ---
 
 ## 功能特色
 
-- 🎮 **彈性時間**：開始遊戲前可選 1–5 分鐘
+- 🎮 **彈性時間**：開始遊戲前可選 1–5 分鐘，或「⏱ 不限時」
+- 📝 **考試模式**：選一個課程，不限時把課程單字考過一輪，結束顯示成績（無複習模式）
 - 🧠 **智慧複習**：根據熟練度決定出題頻率（間隔複習）
 - 🔁 **錯字複習**：結算後可針對答錯的單字再練，全部答對才過關
 - 🎵 **英文發音**：使用瀏覽器內建 Web Speech API
 - ⭐ **星星與成就**：遊戲化鼓勵機制
-- 🔒 **家長模式**：管理學習者、課程、學習報告，並為每位學習者自訂題庫與題型比例
+- 🔒 **家長模式**：管理學習者、課程（滑鼠移到課程卡片可預覽單字）、學習報告，並為每位學習者自訂題庫與題型比例
 - 📱 **支援手機/平板**：大按鈕設計，適合小孩操作
 
 ### 四種題型
@@ -55,46 +54,6 @@ english-word-game/
     ├── ...             ← （攤平，不分年級）
     └── lesson13.json   ← Lesson 13
 ```
-
----
-
-## GitHub Pages 部署
-
-### 步驟一：建立 GitHub Repository
-
-1. 登入 [GitHub](https://github.com)
-2. 點右上角 **+** → **New repository**
-3. Repository name 填入 `5-minute-Vocabulary-game`（或任何名稱）
-4. 選擇 **Public**
-5. 點 **Create repository**
-
-### 步驟二：上傳專案
-
-方法 A（直接上傳）：
-1. 在 Repository 頁面點 **Add file** → **Upload files**
-2. 把整個專案資料夾的檔案全部拖曳上去（注意要保持資料夾結構）
-3. 填入 commit 訊息後點 **Commit changes**
-
-方法 B（使用 git）：
-```bash
-git init
-git add .
-git commit -m "初始版本"
-git branch -M main
-git remote add origin https://github.com/你的帳號/你的-repo-名稱.git
-git push -u origin main
-```
-
-### 步驟三：啟用 GitHub Pages
-
-1. 進入 Repository → **Settings**
-2. 左側選單找 **Pages**
-3. **Source** 選擇 **Deploy from a branch**
-4. **Branch** 選 `main`，資料夾選 `/ (root)`
-5. 點 **Save**
-6. 等待約 1-2 分鐘後，頁面會顯示網站網址
-
-網址格式：`https://你的帳號.github.io/你的-repo-名稱/`
 
 ---
 
@@ -171,6 +130,7 @@ banana,香蕉
 
 依「基因疊加」原則保留歷史脈絡，完整清單見 [CHANGELOG.md](CHANGELOG.md)。
 
+- **v1.2.0（2026-08-13）** — 遊戲時間新增「不限時」選項；新增考試模式（選課程、不限時考一輪、顯示成績、無複習）；家長模式課程卡片滑鼠移上去可預覽單字。
 - **v1.1.1（2026-08-12）** — 「我的課程」只顯示該學習者有學習紀錄的題庫；單字清單改 grid 對齊，長英文不再擠壓中文。
 - **v1.1.0（2026-08-12）** — 移除年級概念，學習者只選課程；題庫攤平至 `data/`（13 課、473 字）；新增單字變化型（複數/進行式）追問；課程清單顯示 variant。
 - **v1.0.2（2026-08-12）** — 學習者個人化：家長模式「遊戲設定」分頁（自訂題庫/題型權重）、可選 1–5 分鐘、錯字複習回合、遊戲中結算按鈕、首頁顯示版本號；修正課程字數「?」與刪除最後學習者返回殘留 bug。

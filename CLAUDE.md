@@ -101,6 +101,10 @@
 
 新增內建課程：加 JSON 檔 → 在 `js/data.js` 的 `BUILTIN_COURSES` 陣列註冊。家長模式亦可線上新增自訂課程（存 localStorage）。
 
+## 家長模式課程單字預覽（`parent.js:renderCourseList`）
+
+課程分頁每張課程卡片滑鼠移上去會顯示完整單字清單（`.pci-tooltip`，CSS `:hover` 觸發）。自訂課程本身已帶完整 `words`，可同步顯示；內建課程需等 `DataManager.loadCourse` 非同步載入完成後才補上。提示框用 `padding-top` 而非 `margin-top` 留視覺間距，避免卡片與提示框之間出現「無元素」的死區導致滑鼠移動時提前觸發 `mouseleave`。
+
 ## 開發慣例
 
 - 原生 JS，ES6+，模組用 IIFE + 全域物件匯出，勿引入框架或打包器（保持零建置）。
@@ -112,9 +116,9 @@
 ## 執行與部署
 
 - 本機：直接開 `index.html`（`fetch` 課程需經 HTTP，建議起簡易伺服器如 `python -m http.server`，`file://` 下 fetch 可能受限）。
-- 部署：GitHub Pages，Branch `main`、資料夾 `/ (root)`。詳見 `README.md`。
+- 部署：GitHub Pages，Branch `main`、資料夾 `/ (root)`。
 
 ## 相關文件
 
-- `README.md` — 對外介紹、部署、新增課程說明
+- `README.md` — 對外介紹、新增課程說明
 - `CHANGELOG.md` — 版本變更紀錄

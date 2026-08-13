@@ -1,57 +1,63 @@
 {
-  "title": "13_難過的sad",
+  "title": "17_貓cat",
   "words": [
     {
-      "en": "sad",
-      "zh": "難過的",
+      "en": "cat",
+      "zh": "貓",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "happy",
-      "zh": "快樂的",
+      "en": "horse",
+      "zh": "馬",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "chubby",
-      "zh": "圓胖的",
+      "en": "rat",
+      "zh": "老鼠",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "thin",
-      "zh": "瘦的",
+      "en": "pig",
+      "zh": "豬",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "young",
-      "zh": "年輕的",
+      "en": "sheep",
+      "zh": "綿羊",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "old",
-      "zh": "年老的",
+      "en": "rabbit",
+      "zh": "兔子",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "short",
-      "zh": "矮的",
+      "en": "chicken",
+      "zh": "雞",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "tall",
-      "zh": "高的",
+      "en": "cow",
+      "zh": "母牛",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "cute",
-      "zh": "可愛的",
+      "en": "duck",
+      "zh": "鴨",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "dog",
+      "zh": "狗",
       "emoji": "",
       "variant": ""
     }

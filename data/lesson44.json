@@ -1,63 +1,63 @@
 {
-  "title": "12_一one",
+  "title": "44_博物館museum",
   "words": [
     {
-      "en": "one",
-      "zh": "一",
+      "en": "museum",
+      "zh": "博物館",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "two",
-      "zh": "二",
+      "en": "clinic",
+      "zh": "診所",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "three",
-      "zh": "三",
+      "en": "bakery",
+      "zh": "麵包店",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "four",
-      "zh": "四",
+      "en": "hospital",
+      "zh": "醫院",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "five",
-      "zh": "五",
+      "en": "movie theater",
+      "zh": "電影院",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "six",
-      "zh": "六",
+      "en": "post office",
+      "zh": "郵局",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "seven",
-      "zh": "七",
+      "en": "restaurant",
+      "zh": "餐廳",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "eight",
-      "zh": "八",
+      "en": "gas station",
+      "zh": "加油站",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "nine",
-      "zh": "九",
+      "en": "toy store",
+      "zh": "玩具店",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "ten",
-      "zh": "十",
+      "en": "library",
+      "zh": "圖書館",
       "emoji": "",
       "variant": ""
     }

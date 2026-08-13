@@ -1,0 +1,53 @@
+{
+  "title": "18_餓hungry",
+  "words": [
+    {
+      "en": "hungry",
+      "zh": "餓",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "thirsty",
+      "zh": "渴",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "angry",
+      "zh": "生氣",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "lazy",
+      "zh": "懶惰",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "noisy",
+      "zh": "吵鬧",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "quiet",
+      "zh": "安靜",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "sleepy",
+      "zh": "愛睏",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "tired",
+      "zh": "疲累",
+      "emoji": "",
+      "variant": ""
+    }
+  ]
+}

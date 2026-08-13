@@ -1,153 +1,21 @@
 {
-  "title": "Lesson 3",
+  "title": "03_山羊goat",
   "words": [
     {
-      "en": "school bag",
-      "zh": "書包",
+      "en": "goat",
+      "zh": "山羊",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "ruler",
-      "zh": "尺",
+      "en": "girl",
+      "zh": "女孩",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "book",
-      "zh": "書",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "pencil case",
-      "zh": "鉛筆盒",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "pencil",
-      "zh": "鉛筆",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "pen",
-      "zh": "原子筆",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "eraser",
-      "zh": "橡皮擦",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "desk",
-      "zh": "書桌",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "chair",
-      "zh": "椅子",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "red",
-      "zh": "紅色",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "yellow",
-      "zh": "黃色",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "green",
-      "zh": "綠色",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "blue",
-      "zh": "藍色",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "pink",
-      "zh": "粉紅色",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "black",
-      "zh": "黑色",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "white",
-      "zh": "白色",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "brown",
-      "zh": "咖啡色",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "orange",
-      "zh": "橘色",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "purple",
-      "zh": "紫色",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "coat",
-      "zh": "外套",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "dress",
-      "zh": "洋裝",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "jacket",
-      "zh": "夾克",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "T-shirt",
-      "zh": "T恤",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "shirt",
-      "zh": "襯衫",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "cap",
-      "zh": "鴨舌帽",
+      "en": "house",
+      "zh": "房子",
       "emoji": "",
       "variant": ""
     },
@@ -158,68 +26,14 @@
       "variant": ""
     },
     {
-      "en": "skirt",
-      "zh": "裙子",
+      "en": "in",
+      "zh": "在…裡",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "cat",
-      "zh": "貓",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "horse",
-      "zh": "馬",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "rat",
-      "zh": "老鼠",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "pig",
-      "zh": "豬",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "sheep",
-      "zh": "綿羊",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "rabbit",
-      "zh": "兔子",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "chicken",
-      "zh": "雞",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "cow",
-      "zh": "母牛",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "duck",
-      "zh": "鴨",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "dog",
-      "zh": "狗",
+      "en": "igloo",
+      "zh": "冰屋",
       "emoji": "",
       "variant": ""
     }

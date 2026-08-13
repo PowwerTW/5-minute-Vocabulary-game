@@ -88,16 +88,18 @@
 
 ## 課程資料格式
 
-`data/lessonNN.json`（攤平於 `data/`，不分年級；目前 `lesson01`–`lesson13`）：
+`data/lessonNN.json`（攤平於 `data/`，不分年級；目前 `lesson01`–`lesson54`，共 54 課、473 字，內容取自 2026 Spelling Bee Team B/C 題庫 PDF）：
 
 ```json
-{ "title": "Lesson 3",
-  "words": [ {"en":"arm","zh":"手臂","emoji":"","variant":"arms"} ] }
+{ "title": "11_爺爺grandfather",
+  "words": [ {"en":"grandfather","zh":"爺爺/外公","emoji":"","variant":""} ] }
 ```
 
-- `en`：拼字答案（片語保留空格，專有名詞/縮寫保留大小寫）。
+- `en`：拼字答案（片語保留空格，專有名詞/縮寫保留大小寫，如 `Wednesday`、`MRT`、`P.E.`）。
+- `zh`：可含多重讀音，以 `/` 分隔（如 `爺爺/外公`），不切分，原樣顯示。
 - `emoji`：一律空字串（遊戲不顯示 emoji）。
-- `variant`：複數/進行式拼法，無則空字串；有值時觸發變化型追問。
+- `variant`：複數/進行式拼法，無則空字串；有值時觸發變化型追問（如 `eye→eyes`、`eat→eating`）。
+- `title` 命名慣例：`NN_中文英文`（如 `01_蘋果apple`），NN 為兩位數序號、中文英文皆取該課第一個單字，兩者直接相連無分隔。此為課程顯示名稱，與檔名 `lessonNN.json`／`BUILTIN_COURSES` 的 `id` 各自獨立（id 仍固定用 `lessonNN`，避免中文/空白檔名的相容性風險）。
 
 新增內建課程：加 JSON 檔 → 在 `js/data.js` 的 `BUILTIN_COURSES` 陣列註冊。家長模式亦可線上新增自訂課程（存 localStorage）。
 

@@ -1,63 +1,63 @@
 {
-  "title": "12_一one",
+  "title": "30_牛奶milk",
   "words": [
     {
-      "en": "one",
-      "zh": "一",
+      "en": "milk",
+      "zh": "牛奶",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "two",
-      "zh": "二",
+      "en": "bread",
+      "zh": "麵包",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "three",
-      "zh": "三",
+      "en": "cake",
+      "zh": "蛋糕",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "four",
-      "zh": "四",
+      "en": "popcorn",
+      "zh": "爆米花",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "five",
-      "zh": "五",
+      "en": "cookies",
+      "zh": "餅乾",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "six",
-      "zh": "六",
+      "en": "ice cream",
+      "zh": "冰淇淋",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "seven",
-      "zh": "七",
+      "en": "juice",
+      "zh": "果汁",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "eight",
-      "zh": "八",
+      "en": "potato chips",
+      "zh": "洋芋片",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "nine",
-      "zh": "九",
+      "en": "tea",
+      "zh": "茶",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "ten",
-      "zh": "十",
+      "en": "coffee",
+      "zh": "咖啡",
       "emoji": "",
       "variant": ""
     }

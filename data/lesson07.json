@@ -1,225 +1,39 @@
 {
-  "title": "Lesson 7",
+  "title": "07_蛇snake",
   "words": [
     {
-      "en": "milk",
-      "zh": "牛奶",
+      "en": "snake",
+      "zh": "蛇",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "bread",
-      "zh": "麵包",
+      "en": "sun",
+      "zh": "太陽",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "cake",
-      "zh": "蛋糕",
+      "en": "tiger",
+      "zh": "老虎",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "popcorn",
-      "zh": "爆米花",
+      "en": "toe",
+      "zh": "腳趾",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "cookies",
-      "zh": "餅乾",
+      "en": "umbrella",
+      "zh": "雨傘",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "ice cream",
-      "zh": "冰淇淋",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "juice",
-      "zh": "果汁",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "potato chips",
-      "zh": "洋芋片",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "tea",
-      "zh": "茶",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "coffee",
-      "zh": "咖啡",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "skateboard",
-      "zh": "滑板",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "action figure",
-      "zh": "公仔",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "puzzle",
-      "zh": "拼圖",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "computer",
-      "zh": "電腦",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "kite",
-      "zh": "風箏",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "stuffed animal",
-      "zh": "填充玩偶",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "jump rope",
-      "zh": "跳繩",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "model car",
-      "zh": "模型車",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "bicycle",
-      "zh": "腳踏車",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "head",
-      "zh": "頭",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "eye",
-      "zh": "眼睛",
-      "emoji": "",
-      "variant": "eyes"
-    },
-    {
-      "en": "ear",
-      "zh": "耳朵",
-      "emoji": "",
-      "variant": "ears"
-    },
-    {
-      "en": "nose",
-      "zh": "鼻子",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "leg",
-      "zh": "腿",
-      "emoji": "",
-      "variant": "legs"
-    },
-    {
-      "en": "hand",
-      "zh": "手",
-      "emoji": "",
-      "variant": "hands"
-    },
-    {
-      "en": "arm",
-      "zh": "手臂",
-      "emoji": "",
-      "variant": "arms"
-    },
-    {
-      "en": "tooth",
-      "zh": "牙齒",
-      "emoji": "",
-      "variant": "teeth"
-    },
-    {
-      "en": "mouth",
-      "zh": "嘴巴",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "foot",
-      "zh": "腳",
-      "emoji": "",
-      "variant": "feet"
-    },
-    {
-      "en": "hair",
-      "zh": "頭髮",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "long",
-      "zh": "長的",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "short",
-      "zh": "短的",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "curly",
-      "zh": "捲的",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "straight",
-      "zh": "直的",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "braided",
-      "zh": "編辮子的",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "blond",
-      "zh": "金髮的",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "dark",
-      "zh": "深色的",
+      "en": "under",
+      "zh": "在…底下",
       "emoji": "",
       "variant": ""
     }

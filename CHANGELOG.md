@@ -3,6 +3,17 @@
 本專案所有重要變更記錄於此檔。
 格式依循 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.1.0/)，版本遵循 [語意化版本](https://semver.org/lang/zh-TW/)。
 
+## [1.3.0] - 2026-08-14
+
+### Changed
+- **題庫全面替換**：`lesson01`–`lesson13`（原 13 課、473 字）改為依「2026 Spelling Bee Team B/C」PDF 題庫重建，共 54 課、473 字。Team B（CTL2/CTL3）與 Team C（CTL4/CTL5）內容重疊部分（字母表～ go hiking）僅建一份，Team C 獨有的後段（日常作息、交通工具、地點、職業、月份、季節…）接續編號建課；`lesson35` 之後的分課再手動微調合併過（含 `lesson40`/`lesson41` 合併，僅 4 字的課併入相鄰課）。
+- 課程切分規則：依原始題庫每 2 行印刷文字切一課，若切出的課不足 4 字則併入前一課（考試模式選擇題需要 ≥4 字才能出四選項）。
+- 課程 `title` 改用 `NN_中文英文` 命名（如 `01_蘋果apple`），取該課第一個單字；`id`／檔名維持 `lessonNN` 不變。
+- `tooth (teeth)`、`eat (eating)` 等括號並列的字改用 `variant` 欄位表示（觸發變化型追問），而非另建詞條。
+
+### Removed
+- 移除舊的 `lesson01`–`lesson13`（原英文小高手內建題庫內容）。
+
 ## [1.2.0] - 2026-08-13
 
 ### Added
@@ -56,6 +67,8 @@
 ### Fixed
 - 修正家長模式內建課程字數顯示「?」的 bug（改非同步載入 JSON 補真實字數）。
 - 修正刪除最後一位學習者後返回仍殘留舊畫面、需重整的 bug。
+
+[1.3.0]: https://github.com/PowwerTW/5-minute-Vocabulary-game/releases/tag/v1.3.0
 
 [1.2.0]: https://github.com/PowwerTW/5-minute-Vocabulary-game/releases/tag/v1.2.0
 

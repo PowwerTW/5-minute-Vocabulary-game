@@ -1,237 +1,27 @@
 {
-  "title": "Lesson 9",
+  "title": "09_溜溜球yo-yo",
   "words": [
     {
-      "en": "get up",
-      "zh": "起床",
+      "en": "yo-yo",
+      "zh": "溜溜球",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "go to school",
-      "zh": "上學",
+      "en": "yellow",
+      "zh": "黃色",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "go to English class",
-      "zh": "上英文課",
+      "en": "zebra",
+      "zh": "斑馬",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "go home",
-      "zh": "回家",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "do my homework",
-      "zh": "作功課",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "take a bath",
-      "zh": "泡澡",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "go to bed",
-      "zh": "睡覺",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "thirty",
-      "zh": "三十",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "forty",
-      "zh": "四十",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "fifty",
-      "zh": "五十",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "HSR",
-      "zh": "高鐵",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "MRT",
-      "zh": "捷運",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "train",
-      "zh": "火車",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "bus",
-      "zh": "公車",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "taxi",
-      "zh": "計程車",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "car",
-      "zh": "汽車",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "scooter",
-      "zh": "小型機車",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "on foot",
-      "zh": "走路",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "motorcycle",
-      "zh": "摩托車",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "airplane",
-      "zh": "飛機",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "helicopter",
-      "zh": "直升機",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "van",
-      "zh": "休旅車",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "subway",
-      "zh": "地鐵",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "boat",
-      "zh": "小船",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "ship",
-      "zh": "船 / 艦",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "city",
-      "zh": "城市",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "countryside",
-      "zh": "鄉村",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "park",
-      "zh": "公園",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "supermarket",
-      "zh": "超市",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "morning",
-      "zh": "早上",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "afternoon",
-      "zh": "下午",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "evening",
-      "zh": "晚上",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "exercise",
-      "zh": "運動",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "keep my diary",
-      "zh": "寫日記",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "read the newspaper",
-      "zh": "看報紙",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "surf the Net",
-      "zh": "上網",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "have a snack",
-      "zh": "吃點心",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "take a nap",
-      "zh": "小睡片刻",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "walk the dog",
-      "zh": "遛狗",
+      "en": "zoo",
+      "zh": "動物園",
       "emoji": "",
       "variant": ""
     }

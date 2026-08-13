@@ -1,63 +1,63 @@
 {
-  "title": "12_一one",
+  "title": "27_鸚鵡parrot",
   "words": [
     {
-      "en": "one",
-      "zh": "一",
+      "en": "parrot",
+      "zh": "鸚鵡",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "two",
-      "zh": "二",
+      "en": "snake",
+      "zh": "蛇",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "three",
-      "zh": "三",
+      "en": "monkey",
+      "zh": "猴子",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "four",
-      "zh": "四",
+      "en": "goat",
+      "zh": "山羊",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "five",
-      "zh": "五",
+      "en": "elephant",
+      "zh": "大象",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "six",
-      "zh": "六",
+      "en": "bear",
+      "zh": "熊",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "seven",
-      "zh": "七",
+      "en": "lion",
+      "zh": "獅子",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "eight",
-      "zh": "八",
+      "en": "hippo",
+      "zh": "河馬",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "nine",
-      "zh": "九",
+      "en": "zebra",
+      "zh": "斑馬",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "ten",
-      "zh": "十",
+      "en": "tiger",
+      "zh": "老虎",
       "emoji": "",
       "variant": ""
     }

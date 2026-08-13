@@ -1,0 +1,53 @@
+{
+  "title": "26_浴室bathroom",
+  "words": [
+    {
+      "en": "bathroom",
+      "zh": "浴室",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "bedroom",
+      "zh": "臥房",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "kitchen",
+      "zh": "廚房",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "dining room",
+      "zh": "飯廳",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "living room",
+      "zh": "客廳",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "yard",
+      "zh": "院子",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "basement",
+      "zh": "地下室",
+      "emoji": "",
+      "variant": ""
+    },
+    {
+      "en": "garden",
+      "zh": "花園",
+      "emoji": "",
+      "variant": ""
+    }
+  ]
+}

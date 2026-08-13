@@ -1,0 +1,65 @@
+{
+  "title": "41_吃eat",
+  "words": [
+    {
+      "en": "eat",
+      "zh": "吃",
+      "emoji": "",
+      "variant": "eating"
+    },
+    {
+      "en": "drink",
+      "zh": "喝",
+      "emoji": "",
+      "variant": "drinking"
+    },
+    {
+      "en": "study",
+      "zh": "讀書",
+      "emoji": "",
+      "variant": "studying"
+    },
+    {
+      "en": "cook",
+      "zh": "烹調",
+      "emoji": "",
+      "variant": "cooking"
+    },
+    {
+      "en": "laugh",
+      "zh": "笑",
+      "emoji": "",
+      "variant": "laughing"
+    },
+    {
+      "en": "sleep",
+      "zh": "睡覺",
+      "emoji": "",
+      "variant": "sleeping"
+    },
+    {
+      "en": "sweep",
+      "zh": "掃地",
+      "emoji": "",
+      "variant": "sweeping"
+    },
+    {
+      "en": "draw",
+      "zh": "畫畫",
+      "emoji": "",
+      "variant": "drawing"
+    },
+    {
+      "en": "mop",
+      "zh": "拖地",
+      "emoji": "",
+      "variant": "mopping"
+    },
+    {
+      "en": "drive",
+      "zh": "開車",
+      "emoji": "",
+      "variant": "driving"
+    }
+  ]
+}

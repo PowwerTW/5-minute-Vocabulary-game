@@ -1,57 +1,57 @@
 {
-  "title": "13_難過的sad",
+  "title": "38_高鐵HSR",
   "words": [
     {
-      "en": "sad",
-      "zh": "難過的",
+      "en": "HSR",
+      "zh": "高鐵",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "happy",
-      "zh": "快樂的",
+      "en": "MRT",
+      "zh": "捷運",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "chubby",
-      "zh": "圓胖的",
+      "en": "train",
+      "zh": "火車",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "thin",
-      "zh": "瘦的",
+      "en": "bus",
+      "zh": "公車",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "young",
-      "zh": "年輕的",
+      "en": "taxi",
+      "zh": "計程車",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "old",
-      "zh": "年老的",
+      "en": "car",
+      "zh": "汽車",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "short",
-      "zh": "矮的",
+      "en": "scooter",
+      "zh": "小型機車",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "tall",
-      "zh": "高的",
+      "en": "on foot",
+      "zh": "走路",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "cute",
-      "zh": "可愛的",
+      "en": "motorcycle",
+      "zh": "摩托車",
       "emoji": "",
       "variant": ""
     }

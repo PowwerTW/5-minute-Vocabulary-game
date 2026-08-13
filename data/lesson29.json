@@ -1,63 +1,63 @@
 {
-  "title": "12_一one",
+  "title": "29_漢堡hamburger",
   "words": [
     {
-      "en": "one",
-      "zh": "一",
+      "en": "hamburger",
+      "zh": "漢堡",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "two",
-      "zh": "二",
+      "en": "french fries",
+      "zh": "薯條",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "three",
-      "zh": "三",
+      "en": "chicken nuggets",
+      "zh": "雞塊",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "four",
-      "zh": "四",
+      "en": "onion rings",
+      "zh": "洋蔥圈",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "five",
-      "zh": "五",
+      "en": "fried chicken",
+      "zh": "炸雞",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "six",
-      "zh": "六",
+      "en": "salad",
+      "zh": "沙拉",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "seven",
-      "zh": "七",
+      "en": "hot dog",
+      "zh": "熱狗",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "eight",
-      "zh": "八",
+      "en": "soda",
+      "zh": "汽水",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "nine",
-      "zh": "九",
+      "en": "cola",
+      "zh": "可樂",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "ten",
-      "zh": "十",
+      "en": "pizza",
+      "zh": "披薩",
       "emoji": "",
       "variant": ""
     }

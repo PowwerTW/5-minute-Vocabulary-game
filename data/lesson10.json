@@ -1,231 +1,39 @@
 {
-  "title": "Lesson 10",
+  "title": "10_男孩boy",
   "words": [
     {
-      "en": "eat",
-      "zh": "吃",
-      "emoji": "",
-      "variant": "eating"
-    },
-    {
-      "en": "drink",
-      "zh": "喝",
-      "emoji": "",
-      "variant": "drinking"
-    },
-    {
-      "en": "study",
-      "zh": "讀書",
-      "emoji": "",
-      "variant": "studying"
-    },
-    {
-      "en": "cook",
-      "zh": "烹調",
-      "emoji": "",
-      "variant": "cooking"
-    },
-    {
-      "en": "laugh",
-      "zh": "笑",
-      "emoji": "",
-      "variant": "laughing"
-    },
-    {
-      "en": "sleep",
-      "zh": "睡覺",
-      "emoji": "",
-      "variant": "sleeping"
-    },
-    {
-      "en": "sweep",
-      "zh": "掃地",
-      "emoji": "",
-      "variant": "sweeping"
-    },
-    {
-      "en": "draw",
-      "zh": "畫畫",
-      "emoji": "",
-      "variant": "drawing"
-    },
-    {
-      "en": "mop",
-      "zh": "拖地",
-      "emoji": "",
-      "variant": "mopping"
-    },
-    {
-      "en": "drive",
-      "zh": "開車",
-      "emoji": "",
-      "variant": "driving"
-    },
-    {
-      "en": "comb my hair",
-      "zh": "梳頭髮",
+      "en": "boy",
+      "zh": "男孩",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "make my bed",
-      "zh": "整理床鋪",
+      "en": "man",
+      "zh": "男人",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "wash my face",
-      "zh": "洗臉",
+      "en": "student",
+      "zh": "學生",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "do the dishes",
-      "zh": "洗碗",
+      "en": "girl",
+      "zh": "女孩",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "brush my teeth",
-      "zh": "刷牙",
+      "en": "woman",
+      "zh": "女人",
       "emoji": "",
       "variant": ""
     },
     {
-      "en": "have breakfast",
-      "zh": "吃早餐",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "have lunch",
-      "zh": "吃午餐",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "have dinner",
-      "zh": "吃晚餐",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "fire station",
-      "zh": "消防局",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "bank",
-      "zh": "銀行",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "police station",
-      "zh": "警察局",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "MRT station",
-      "zh": "捷運站",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "bus stop",
-      "zh": "公車站",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "convenience store",
-      "zh": "便利商店",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "department store",
-      "zh": "百貨公司",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "bookstore",
-      "zh": "書店",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "next to",
-      "zh": "在…旁邊",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "across from",
-      "zh": "在…對面",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "museum",
-      "zh": "博物館",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "clinic",
-      "zh": "診所",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "bakery",
-      "zh": "麵包店",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "hospital",
-      "zh": "醫院",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "movie theater",
-      "zh": "電影院",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "post office",
-      "zh": "郵局",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "restaurant",
-      "zh": "餐廳",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "gas station",
-      "zh": "加油站",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "toy store",
-      "zh": "玩具店",
-      "emoji": "",
-      "variant": ""
-    },
-    {
-      "en": "library",
-      "zh": "圖書館",
+      "en": "teacher",
+      "zh": "老師",
       "emoji": "",
       "variant": ""
     }

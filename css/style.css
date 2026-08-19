@@ -508,6 +508,7 @@ html, body {
 .game-options-listen { grid-template-columns: 1fr 1fr; }
 
 .btn-option {
+  position: relative;
   background: #f8f7ff;
   color: #1a1a2e;
   border: 2px solid #DDD6FE;
@@ -553,7 +554,23 @@ html, body {
   color: #991b1b;
   animation: wrongShake 0.4s ease;
 }
-.btn-option.option-selected { transform: scale(0.98); }
+.btn-option.option-selected {
+  background: #EDE9FE;
+  border-color: #7C3AED;
+  border-width: 3px;
+  color: #4c1d95;
+  transform: scale(0.98);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+.btn-option.option-selected::after {
+  content: '✓';
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  color: #7C3AED;
+  font-size: 1rem;
+  font-weight: 900;
+}
 
 /* Spelling Click */
 .q-spelling-click, .q-choice, .q-listen, .q-spelling-type {
@@ -1111,6 +1128,7 @@ html, body {
 .exam-course-list { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; max-height: 50vh; overflow-y: auto; }
 .exam-course-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 0.7rem; border: 1px solid #e5e7eb; border-radius: 10px; cursor: pointer; }
 .exam-course-item input { width: 22px; height: 22px; }
+#btn-start-exam-confirm { display: flex; margin: 1rem auto 0; }
 .exam-course-item .ecc-title { flex: 1; }
 
 /* ── Choice Confirm Button ────────────────────────────────── */

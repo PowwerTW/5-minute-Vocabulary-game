@@ -5,7 +5,7 @@
 
 // ── App Version ───────────────────────────────────────────────
 // 版本號單一來源：改這裡即可。首頁會自動顯示。
-const APP_VERSION = 'v1.3.0';
+const APP_VERSION = 'v1.4.0';
 
 // ── Global State ──────────────────────────────────────────────
 
@@ -310,31 +310,54 @@ function openExamCourseModal() {
 
   const courses = DataManager.getAllCourses();
   container.innerHTML = courses.map(c =>
-    `<button class="btn duration-btn" data-course-id="${escHtml(c.id)}">${escHtml(c.title)}</button>`
+    `<label class="exam-course-item">
+      <input type="checkbox" class="exam-course-cb" value="${escHtml(c.id)}">
+      <span class="ecc-title">${escHtml(c.title)}</span>
+    </label>`
   ).join('');
 
-  container.querySelectorAll('.duration-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      btn.disabled = true;
-      try {
-        const course = await DataManager.loadCourse(btn.dataset.courseId);
-        if (!course || !Array.isArray(course.words) || course.words.length < 4) {
-          showToast('此課程單字不足，無法出題', 'error');
-          return;
-        }
-        AppState.gameWords = course.words;
-        closeExamCourseModal();
-        showView('view-game');
-        startExam();
-      } catch (e) {
-        showToast('載入失敗：' + e.message, 'error');
-      } finally {
-        btn.disabled = false;
-      }
-    });
-  });
-
   modal.style.display = 'flex';
+}
+
+async function startExamFromSelection() {
+  const container = document.getElementById('exam-course-options');
+  const btn = document.getElementById('btn-start-exam-confirm');
+  if (!container || !btn) return;
+
+  const ids = Array.from(container.querySelectorAll('.exam-course-cb'))
+    .filter(cb => cb.checked).map(cb => cb.value);
+  if (ids.length === 0) { showToast('請至少選一個課程', 'warning'); return; }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ 載入中...';
+  try {
+    // 合併所選課程單字，依 en 去重（避免跨課程重複字重複出題）
+    const seen = new Set();
+    const merged = [];
+    for (const id of ids) {
+      const course = await DataManager.loadCourse(id);
+      if (!course || !Array.isArray(course.words)) continue;
+      for (const w of course.words) {
+        const key = (w.en || '').toLowerCase();
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        merged.push(w);
+      }
+    }
+    if (merged.length < 4) {
+      showToast('所選課程單字不足（需至少 4 字）', 'error');
+      return;
+    }
+    AppState.gameWords = merged;
+    closeExamCourseModal();
+    showView('view-game');
+    startExam();
+  } catch (e) {
+    showToast('載入失敗：' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '開始考試';
+  }
 }
 
 function closeExamCourseModal() {
@@ -345,6 +368,9 @@ function closeExamCourseModal() {
 function initExamCourseModal() {
   const closeBtn = document.getElementById('btn-close-exam-course');
   if (closeBtn) closeBtn.addEventListener('click', closeExamCourseModal);
+
+  const confirmBtn = document.getElementById('btn-start-exam-confirm');
+  if (confirmBtn) confirmBtn.addEventListener('click', startExamFromSelection);
 
   const modal = document.getElementById('exam-course-modal');
   if (modal) {
@@ -542,6 +568,7 @@ function renderChoiceQuestion(question, area) {
           </button>`;
         }).join('')}
       </div>
+      <button class="btn btn-primary btn-choice-confirm" id="btn-choice-confirm">確定</button>
     </div>
   `;
   bindChoiceOptions(area, question);
@@ -562,6 +589,7 @@ function renderListenQuestion(question, area) {
           </button>`;
         }).join('')}
       </div>
+      <button class="btn btn-primary btn-choice-confirm" id="btn-choice-confirm">確定</button>
     </div>
   `;
   const btnAgain = document.getElementById('btn-listen-again');
@@ -607,7 +635,11 @@ function renderSpellingClickQuestion(question, area) {
 
   document.getElementById('btn-confirm-spelling').addEventListener('click', () => {
     if (AppState.answerLocked) return;
-    const answer = AppState.selectedLetters.join('');
+    if (AppState.selectedLetters.length < word.en.length) {
+      showToast('請把字母排滿再確定', 'warning');
+      return;
+    }
+    const answer = AppState.selectedLetters.map(s => s.letter).join('');
     submitAnswer(question, answer);
   });
 }
@@ -646,16 +678,7 @@ function bindLetterButtons(question) {
       AppState.selectedLetters.push({ letter, btnIdx: idx });
       btn.classList.add('used');
       updateAnswerSlots(question);
-
-      // Auto-submit when all slots filled
-      if (AppState.selectedLetters.length === wordLen) {
-        setTimeout(() => {
-          if (!AppState.answerLocked) {
-            const answer = AppState.selectedLetters.map(s => s.letter).join('');
-            submitAnswer(question, answer);
-          }
-        }, 300);
-      }
+      // 不自動送出，等使用者按「確定」，避免誤按
     });
   });
 }
@@ -834,13 +857,25 @@ function showFeedback(correct, word) {
 }
 
 function bindChoiceOptions(area, question) {
-  area.querySelectorAll('.btn-option').forEach(btn => {
+  const opts = area.querySelectorAll('.btn-option');
+  opts.forEach(btn => {
     btn.addEventListener('click', () => {
       if (AppState.answerLocked) return;
+      // 單選：清掉其他選取，只標記本選項（不直接送出，避免誤按）
+      opts.forEach(b => b.classList.remove('option-selected'));
       btn.classList.add('option-selected');
-      submitAnswer(question, btn.dataset.answer);
     });
   });
+
+  const confirmBtn = area.querySelector('#btn-choice-confirm');
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', () => {
+      if (AppState.answerLocked) return;
+      const selected = area.querySelector('.btn-option.option-selected');
+      if (!selected) { showToast('請先選一個答案', 'warning'); return; }
+      submitAnswer(question, selected.dataset.answer);
+    });
+  }
 
   // Bind inline speak buttons
   area.querySelectorAll('.btn-speak-inline').forEach(btn => {

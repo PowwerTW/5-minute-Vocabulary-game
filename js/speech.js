@@ -41,6 +41,8 @@ const Speech = (() => {
     return enVoices.find(v => v.lang === 'en-US') || enVoices[0];
   }
 
+  let _unlocked = false;
+
   function init() {
     try {
       if ('speechSynthesis' in window) {
@@ -50,10 +52,25 @@ const Speech = (() => {
         // 立刻嘗試取得語音清單（某些瀏覽器同步可用）
         _loadVoices();
 
-        // Chrome 等需要等 voiceschanged 事件才能取得全部語音
+        // Chrome / Android 等需要等 voiceschanged 事件才能取得全部語音
         _synth.addEventListener('voiceschanged', () => {
           _loadVoices();
         });
+
+        // 行動裝置（尤其 Android Chrome）需在使用者手勢中先「解鎖」語音引擎，
+        // 否則之後的 speak 會被瀏覽器靜音。第一次觸控／點擊時送一個靜音 utterance。
+        const unlock = () => {
+          if (_unlocked || !_synth) return;
+          try {
+            const u = new SpeechSynthesisUtterance('');
+            u.volume = 0;
+            _synth.speak(u);
+            _synth.resume();
+            _unlocked = true;
+          } catch (e) { /* ignore */ }
+        };
+        window.addEventListener('touchend', unlock, { once: true, passive: true });
+        window.addEventListener('click', unlock, { once: true });
       }
     } catch (e) {
       _supported = false;
@@ -67,26 +84,27 @@ const Speech = (() => {
       return;
     }
     try {
+      // 直接在使用者手勢中同步呼叫，勿用 setTimeout 延遲——延遲會脫離手勢
+      // 情境，Android Chrome 會因此拒絕發音。
       _synth.cancel();
 
-      // 短暫延遲讓 cancel 生效（Chrome 有時需要）
-      setTimeout(() => {
-        const utt = new SpeechSynthesisUtterance(text);
-        utt.lang = 'en-US';
-        utt.rate = _rate;
-        utt.pitch = 1.0;
-        utt.volume = 1.0;
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = 'en-US';
+      utt.rate = _rate;
+      utt.pitch = 1.0;
+      utt.volume = 1.0;
 
-        // 指定最佳語音
-        const bestVoice = _getBestVoice();
-        if (bestVoice) utt.voice = bestVoice;
+      // 指定最佳語音（Android 語音清單可能較晚載入，無合適語音時交由系統預設）
+      const bestVoice = _getBestVoice();
+      if (bestVoice) utt.voice = bestVoice;
 
-        if (typeof onEnd === 'function') {
-          utt.onend = onEnd;
-          utt.onerror = onEnd;
-        }
-        _synth.speak(utt);
-      }, 80);
+      if (typeof onEnd === 'function') {
+        utt.onend = onEnd;
+        utt.onerror = onEnd;
+      }
+      _synth.speak(utt);
+      // Chrome/Android 有時 speak 後停在 paused 狀態，主動 resume
+      _synth.resume();
     } catch (e) {
       if (typeof onEnd === 'function') onEnd();
     }

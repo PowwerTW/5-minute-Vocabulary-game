@@ -3,6 +3,17 @@
 本專案所有重要變更記錄於此檔。
 格式依循 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.1.0/)，版本遵循 [語意化版本](https://semver.org/lang/zh-TW/)。
 
+## [1.4.0] - 2026-08-19
+
+### Changed
+- 考試模式改為可**複選課程**：勾選多個課程一起考，合併所選課程單字並依 `en` 去重出題（`app.js:startExamFromSelection`）。
+- 選擇題、聽力題、拼字（點選）改為「先選取、按確定才送出」，避免手滑誤觸直接判分；拼字（點選）移除填滿字母自動送出的行為。
+- 考試模式「開始考試」按鈕改置中顯示；選擇題選取狀態改用明顯的紫色底色＋外框光暈＋✓ 勾勾，取代原本幾乎看不出來的縮放效果。
+
+### Fixed
+- 修正拼字（點選）確定鈕原本對物件陣列直接 `join`，答案被送出成 `[object Object]` 的隱藏 bug。
+- 修正 Android Chrome 不發音的問題：`speech.js` 的 `speak()` 移除 `setTimeout` 延遲呼叫（延遲會脫離使用者手勢情境導致瀏覽器拒絕發音），改為在手勢中同步呼叫；並在使用者第一次觸控/點擊時以靜音 utterance 解鎖語音引擎、`speak()` 後主動呼叫 `resume()`。
+
 ## [1.3.0] - 2026-08-14
 
 ### Changed
@@ -67,6 +78,8 @@
 ### Fixed
 - 修正家長模式內建課程字數顯示「?」的 bug（改非同步載入 JSON 補真實字數）。
 - 修正刪除最後一位學習者後返回仍殘留舊畫面、需重整的 bug。
+
+[1.4.0]: https://github.com/PowwerTW/5-minute-Vocabulary-game/releases/tag/v1.4.0
 
 [1.3.0]: https://github.com/PowwerTW/5-minute-Vocabulary-game/releases/tag/v1.3.0
 

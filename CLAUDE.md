@@ -20,7 +20,7 @@
 | 檔案 | 全域物件 | 職責 |
 |------|----------|------|
 | `js/storage.js` | `Storage` | localStorage 讀寫：學習者、單字熟練度、自訂課程、每日任務 |
-| `js/speech.js` | （語音模組） | Web Speech API 封裝，優先選高品質 en-US 語音 |
+| `js/speech.js` | （語音模組） | Web Speech API 封裝，優先選高品質 en-US 語音；行動裝置手勢解鎖與 resume() |
 | `js/data.js` | `DataManager` | 課程載入/快取、依學習者設定取單字、貼上文字解析 |
 | `js/game.js` | `Game` | 一般／複習／考試三種模式：狀態、計時器、加權選題、出題、判分、變化型追問 |
 | `js/parent.js` | `ParentMode` | 學習者管理、自訂課程、學習報告、清除資料（渲染輔助） |
@@ -84,7 +84,11 @@
 
 ## 考試模式（`game.js:initExam`）
 
-首頁「📝 考試模式」→ 選擇要考的課程（`#exam-course-modal`，列出 `DataManager.getAllCourses()`，含內建與自訂課程）→ 該課程單字洗牌後依序出題，每字僅出現一次、不限時、不觸發變化型追問，出完顯示成績（`renderExamResult`），**沒有複習模式**。誘答選項僅取自該課程本身（見 `Game.initExam` 的 `examWords`），因此課程單字需 ≥4 個才能進入考試。考試不影響星星、連續天數、每日任務與成就，但仍會更新單字熟練度（`Storage.updateWordMastery`）。結果頁的「再來一次」會依 `AppState.wasExam` 判斷要重新開始同一場考試或一般遊戲。
+首頁「📝 考試模式」→ 勾選要考的課程（`#exam-course-modal`，可複選，列出 `DataManager.getAllCourses()`，含內建與自訂課程）→ 按「開始考試」（`app.js:startExamFromSelection`）合併所有勾選課程的單字、依 `en` 去重，洗牌後依序出題，每字僅出現一次、不限時、不觸發變化型追問，出完顯示成績（`renderExamResult`），**沒有複習模式**。誘答選項僅取自本次合併後的單字集合（見 `Game.initExam` 的 `examWords`），因此勾選課程合併後單字需 ≥4 個才能進入考試。考試不影響星星、連續天數、每日任務與成就，但仍會更新單字熟練度（`Storage.updateWordMastery`）。結果頁的「再來一次」會依 `AppState.wasExam` 判斷要重新開始同一場考試或一般遊戲。
+
+## 作答確認（防誤按）
+
+選擇題、聽力題、拼字（點選）三種題型都不會「一點選就送出」，而是先標記選取狀態（`.option-selected` / 已選字母），使用者按下畫面上的「確定」鈕（`#btn-choice-confirm` / `#btn-confirm-spelling`）才會判分（`bindChoiceOptions`、`renderSpellingClickQuestion` 內的確定鈕事件）。拼字（打字）本來就是輸入完按確定，不受影響。
 
 ## 課程資料格式
 

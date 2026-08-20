@@ -3,6 +3,16 @@
 本專案所有重要變更記錄於此檔。
 格式依循 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.1.0/)，版本遵循 [語意化版本](https://semver.org/lang/zh-TW/)。
 
+## [1.5.0] - 2026-08-20
+
+### Added
+- 新增**音效模組** `js/sound.js`（`Sound`，Web Audio API 合成，無外部音檔）：
+  - 答對播上行雙音（G5→C6）、答錯播低沉下行音（Eb4→Bb3）、點選／打字播短促 tick（`app.js:showFeedback` 串接答對錯）。
+  - **全站按鈕點選音效**：於 `document` 委派 click，任一 `<button>` 被點到即播 tick，涵蓋所有頁面與彈窗；答題鎖定後選項鈕 `disabled` 不會誤響。
+  - 拼字（打字）題輸入框以 `input` 事件加逐字 tick。
+  - 遊戲畫面新增 **🔊 音效 / 🔇 靜音** 切換鈕，狀態存 localStorage（key：`vocab_game_sound_v1`），跨場記憶。
+  - 行動裝置／Chrome 需在使用者手勢中 `resume` AudioContext，`Sound.init` 於首次 touch/click 解鎖。
+
 ## [1.4.2] - 2026-08-20
 
 ### Fixed

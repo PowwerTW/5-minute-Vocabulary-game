@@ -5,7 +5,7 @@
 
 // ── App Version ───────────────────────────────────────────────
 // 版本號單一來源：改這裡即可。首頁會自動顯示。
-const APP_VERSION = 'v1.4.2';
+const APP_VERSION = 'v1.5.0';
 
 // ── Global State ──────────────────────────────────────────────
 
@@ -763,6 +763,8 @@ function renderSpellingTypeQuestion(question, area) {
         document.getElementById('btn-type-confirm').click();
       }
     });
+    // 打字（含刪字）時的點選 tick
+    input.addEventListener('input', () => Sound.click());
   }
 
   document.getElementById('btn-type-confirm').addEventListener('click', () => {
@@ -869,9 +871,11 @@ function showFeedback(correct, word) {
   if (correct) {
     feedback.innerHTML = '<div class="feedback-correct">✨ 答對了！+1⭐</div>';
     feedback.className = 'game-feedback feedback-show-correct';
+    Sound.correct();
   } else {
     feedback.innerHTML = `<div class="feedback-wrong">✗ 正確答案：${escHtml(word.en)}</div>`;
     feedback.className = 'game-feedback feedback-show-wrong';
+    Sound.wrong();
   }
 
   // Highlight option buttons
@@ -924,6 +928,19 @@ function initGameView() {
   if (rateSelect) {
     rateSelect.addEventListener('change', () => {
       Speech.setRate(parseFloat(rateSelect.value));
+    });
+  }
+
+  // 音效開關
+  const soundBtn = document.getElementById('btn-toggle-sound');
+  if (soundBtn) {
+    const syncSoundLabel = () => {
+      soundBtn.textContent = Sound.isEnabled() ? '🔊 音效' : '🔇 靜音';
+    };
+    syncSoundLabel();
+    soundBtn.addEventListener('click', () => {
+      Sound.toggle();
+      syncSoundLabel();
     });
   }
 
@@ -1695,6 +1712,13 @@ function initParentView() {
 document.addEventListener('DOMContentLoaded', () => {
   // Init modules
   Speech.init();
+  Sound.init();
+
+  // 全站按鈕點選音效（事件委派，涵蓋所有頁面與日後新增的按鈕）。
+  // disabled 的按鈕不會觸發 click，故答題鎖定後不會誤響。
+  document.addEventListener('click', e => {
+    if (e.target.closest('button')) Sound.click();
+  });
 
   // 顯示版本號
   const verEl = document.getElementById('app-version');

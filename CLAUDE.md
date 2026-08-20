@@ -21,12 +21,13 @@
 |------|----------|------|
 | `js/storage.js` | `Storage` | localStorage 讀寫：學習者、單字熟練度、自訂課程、每日任務 |
 | `js/speech.js` | （語音模組） | Web Speech API 封裝，優先選高品質 en-US 語音；行動裝置手勢解鎖與 resume() |
+| `js/sound.js` | `Sound` | Web Audio API 合成音效（答對／答錯／點選 tick），無外部音檔；開關存 localStorage |
 | `js/data.js` | `DataManager` | 課程載入/快取、依學習者設定取單字、貼上文字解析 |
 | `js/game.js` | `Game` | 一般／複習／考試三種模式：狀態、計時器、加權選題、出題、判分、變化型追問 |
 | `js/parent.js` | `ParentMode` | 學習者管理、自訂課程、學習報告、清除資料（渲染輔助） |
 | `js/app.js` | （主控制器） | View 切換、事件綁定、串接各模組 |
 
-**載入順序有相依性**：`storage` → `speech` → `data` → `game` → `parent` → `app`。`DataManager` 依賴 `Storage`，`Game` 依賴 `Storage`，不可調換。
+**載入順序有相依性**：`storage` → `speech` → `sound` → `data` → `game` → `parent` → `app`。`DataManager` 依賴 `Storage`，`Game` 依賴 `Storage`，不可調換。`Sound` 無相依，位置僅需在 `app` 之前。
 
 ## 核心資料模型
 
@@ -89,6 +90,16 @@
 ## 作答確認（防誤按）
 
 選擇題、聽力題、拼字（點選）三種題型都不會「一點選就送出」，而是先標記選取狀態（`.option-selected` / 已選字母），使用者按下畫面上的「確定」鈕（`#btn-choice-confirm` / `#btn-confirm-spelling`）才會判分（`bindChoiceOptions`、`renderSpellingClickQuestion` 內的確定鈕事件）。拼字（打字）本來就是輸入完按確定，不受影響。
+
+## 音效（`js/sound.js`）
+
+`Sound` 以 Web Audio API 即時合成三種音效，**不含任何外部音檔**（維持零素材、零建置）：`correct()` 上行雙音、`wrong()` 低沉下行、`click()` 短促 tick，皆帶淡入淡出包絡避免爆音。
+
+- **全站點選音效**：`app.js` 在 `DOMContentLoaded` 於 `document` 委派一個 click，任一 `<button>` 被點到即 `Sound.click()`，涵蓋所有頁面與彈窗、含日後新增按鈕；答題鎖定後選項鈕會 `disabled`，disabled 按鈕不觸發 click，故不會誤響。因為改用全域委派，個別按鈕（選項、字母鈕、首頁按鈕）**不可**再各自呼叫 `Sound.click()`，否則同一次點擊會重複播放。
+- **答對／答錯音**：於 `app.js:showFeedback`（一般／複習／考試共用進入點）串接 `Sound.correct()` / `Sound.wrong()`。
+- **打字題 tick**：拼字（打字）輸入框 `#spelling-type-input` 綁 `input` 事件逐字（含刪字）播 tick。
+- **開關**：遊戲畫面 🔊/🔇 切換鈕（`#btn-toggle-sound`），`Sound.toggle()` 存 localStorage（key：`vocab_game_sound_v1`，與主資料 `vocab_game_data_v1` 分開），預設開啟、跨場記憶。
+- **手勢解鎖**：行動裝置／Chrome 的 `AudioContext` 需在使用者手勢中 `resume` 才會出聲，`Sound.init` 於首次 touch/click 解鎖（同 `speech.js` 的作法）。
 
 ## 課程資料格式
 

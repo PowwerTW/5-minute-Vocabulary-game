@@ -3,6 +3,19 @@
 本專案所有重要變更記錄於此檔。
 格式依循 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.1.0/)，版本遵循 [語意化版本](https://semver.org/lang/zh-TW/)。
 
+## [1.4.2] - 2026-08-20
+
+### Fixed
+- 考試模式一題都沒作答就按「🏁 結算成績」時，不再顯示假的「全部答對」結果；改為提示「尚未作答，已離開考試」並直接回首頁（`app.js:onExamEnd` 加 `totalAnswered === 0` 守衛）。
+
+## [1.4.1] - 2026-08-20
+
+### Added
+- 考試模式課程選擇彈窗新增「全選」按鈕：一鍵勾選所有課程，全部勾選後按鈕變為「取消全選」可一鍵清除；手動勾選也會同步切換按鈕文字（`app.js:toggleExamSelectAll`／`updateExamSelectAllLabel`）。
+
+### Changed
+- 考試模式單場最多出題 50 題：合併去重後的單字若超過 50 個，洗牌後只取前 50 題出題；誘答選項仍取自完整合併集合（`game.js:initExam` 的 `EXAM_MAX_QUESTIONS`）。
+
 ## [1.4.0] - 2026-08-19
 
 ### Changed

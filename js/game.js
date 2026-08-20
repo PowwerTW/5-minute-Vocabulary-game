@@ -14,6 +14,9 @@ const Game = (() => {
 
   const EXTRA_LETTERS = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
+  // 考試模式單場最多出題數（合併課程超過此數時隨機取此數量）
+  const EXAM_MAX_QUESTIONS = 50;
+
   // duration：秒數；null/0/未提供 = 不限時（計時器改為往上數）
   function init(learner, words, { onTick, onEnd, duration }) {
     _learner = learner;
@@ -70,8 +73,9 @@ const Game = (() => {
   // examWords 同時作為誘答選項來源，僅取自該課程本身。
   function initExam(learner, examWords, { onEnd }) {
     _learner = learner;
+    // 誘答選項仍可取自完整單字集合，但實際出題最多 50 題
     _allWords = examWords;
-    _examQueue = _shuffle(examWords);
+    _examQueue = _shuffle(examWords).slice(0, EXAM_MAX_QUESTIONS);
     _onTick = null;
     _onEnd = onEnd || null;
 
@@ -86,7 +90,7 @@ const Game = (() => {
       wrongWords: [],
       paused: false,
       examIndex: 0,
-      examTotal: examWords.length
+      examTotal: _examQueue.length
     };
 
     return _state;

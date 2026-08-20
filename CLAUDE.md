@@ -84,7 +84,7 @@
 
 ## 考試模式（`game.js:initExam`）
 
-首頁「📝 考試模式」→ 勾選要考的課程（`#exam-course-modal`，可複選，列出 `DataManager.getAllCourses()`，含內建與自訂課程）→ 按「開始考試」（`app.js:startExamFromSelection`）合併所有勾選課程的單字、依 `en` 去重，洗牌後依序出題，每字僅出現一次、不限時、不觸發變化型追問，出完顯示成績（`renderExamResult`），**沒有複習模式**。誘答選項僅取自本次合併後的單字集合（見 `Game.initExam` 的 `examWords`），因此勾選課程合併後單字需 ≥4 個才能進入考試。考試不影響星星、連續天數、每日任務與成就，但仍會更新單字熟練度（`Storage.updateWordMastery`）。結果頁的「再來一次」會依 `AppState.wasExam` 判斷要重新開始同一場考試或一般遊戲。
+首頁「📝 考試模式」→ 勾選要考的課程（`#exam-course-modal`，可複選，列出 `DataManager.getAllCourses()`，含內建與自訂課程；上方「全選」鈕可一鍵全選/取消全選，見 `app.js:toggleExamSelectAll`／`updateExamSelectAllLabel`）→ 按「開始考試」（`app.js:startExamFromSelection`）合併所有勾選課程的單字、依 `en` 去重，洗牌後依序出題，每字僅出現一次、不限時、不觸發變化型追問，出完顯示成績（`renderExamResult`），**沒有複習模式**。**單場最多出題 `EXAM_MAX_QUESTIONS`（50）題**：合併去重後單字超過 50 個時，`Game.initExam` 洗牌後 `.slice(0, 50)` 只取前 50 題，`_state.examTotal` 亦以實際出題數計。誘答選項僅取自本次合併後的完整單字集合（`_allWords` 保留全部，見 `Game.initExam` 的 `examWords`），因此勾選課程合併後單字需 ≥4 個才能進入考試。考試不影響星星、連續天數、每日任務與成就，但仍會更新單字熟練度（`Storage.updateWordMastery`）。一題都沒作答就按「🏁 結算成績」時，`app.js:onExamEnd` 以 `totalAnswered === 0` 守衛擋掉：不顯示（假的）全對結果，改提示後直接回首頁。結果頁的「再來一次」會依 `AppState.wasExam` 判斷要重新開始同一場考試或一般遊戲。
 
 ## 作答確認（防誤按）
 

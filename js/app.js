@@ -5,7 +5,7 @@
 
 // ── App Version ───────────────────────────────────────────────
 // 版本號單一來源：改這裡即可。首頁會自動顯示。
-const APP_VERSION = 'v1.4.0';
+const APP_VERSION = 'v1.4.2';
 
 // ── Global State ──────────────────────────────────────────────
 
@@ -316,7 +316,29 @@ function openExamCourseModal() {
     </label>`
   ).join('');
 
+  updateExamSelectAllLabel();
   modal.style.display = 'flex';
+}
+
+// 全選／全不選切換：全部已勾選時再按取消全選，否則全選
+function toggleExamSelectAll() {
+  const container = document.getElementById('exam-course-options');
+  if (!container) return;
+  const cbs = Array.from(container.querySelectorAll('.exam-course-cb'));
+  if (cbs.length === 0) return;
+  const allChecked = cbs.every(cb => cb.checked);
+  cbs.forEach(cb => { cb.checked = !allChecked; });
+  updateExamSelectAllLabel();
+}
+
+// 依目前勾選狀態更新全選鈕文字
+function updateExamSelectAllLabel() {
+  const container = document.getElementById('exam-course-options');
+  const btn = document.getElementById('btn-exam-select-all');
+  if (!container || !btn) return;
+  const cbs = Array.from(container.querySelectorAll('.exam-course-cb'));
+  const allChecked = cbs.length > 0 && cbs.every(cb => cb.checked);
+  btn.textContent = allChecked ? '取消全選' : '全選';
 }
 
 async function startExamFromSelection() {
@@ -371,6 +393,19 @@ function initExamCourseModal() {
 
   const confirmBtn = document.getElementById('btn-start-exam-confirm');
   if (confirmBtn) confirmBtn.addEventListener('click', startExamFromSelection);
+
+  const selectAllBtn = document.getElementById('btn-exam-select-all');
+  if (selectAllBtn) selectAllBtn.addEventListener('click', toggleExamSelectAll);
+
+  // 手動勾選課程時同步全選鈕文字（全選/取消全選）
+  const optContainer = document.getElementById('exam-course-options');
+  if (optContainer) {
+    optContainer.addEventListener('change', e => {
+      if (e.target && e.target.classList.contains('exam-course-cb')) {
+        updateExamSelectAllLabel();
+      }
+    });
+  }
 
   const modal = document.getElementById('exam-course-modal');
   if (modal) {
@@ -1099,6 +1134,13 @@ function onExamEnd(state) {
   AppState.examMode = false;
   AppState.wasExam = true;
   AppState.lastExamWords = AppState.gameWords;
+  // 一題都沒作答就結算：不顯示（假的）全對結果，直接回首頁
+  if (!state || state.totalAnswered === 0) {
+    showToast('尚未作答，已離開考試', 'warning');
+    renderHome();
+    showView('view-home');
+    return;
+  }
   showView('view-result');
   renderExamResult(state);
 }
